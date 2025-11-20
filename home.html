@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COMPASS — Gamified Health Experience</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  
+  <!-- Sound effects library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
+  <!-- Tailwind config -->
+  <script>
+    tailwind.config = {
+      theme: { 
+        extend: { 
+          colors: { },
+          animation: { 
+            'gradient-x': 'gradientX 18s ease infinite', 
+            'float': 'float 4s ease-in-out infinite', 
+            'shine': 'shine 2.5s linear infinite',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'bounce-in': 'bounceIn 0.6s ease-out',
+            'shake': 'shake 0.5s ease-in-out',
+            'zoom-in': 'zoomIn 0.3s ease-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+            'fire': 'fire 1.5s ease-in-out infinite',
+            'combo-pulse': 'comboPulse 0.8s ease-in-out infinite',
+            'level-up': 'levelUp 1.2s ease-out',
+            'badge-unlock': 'badgeUnlock 1s ease-out',
+            'streak-fire': 'streakFire 2s ease-in-out infinite'
+          }, 
+          keyframes: { 
+            gradientX: { 
+              '0%,100%': { backgroundPosition: '0% 50%' }, 
+              '50%': { backgroundPosition: '100% 50%' } 
+            }, 
+            float: { 
+              '0%,100%': { transform:'translateY(0)' }, 
+              '50%': { transform:'translateY(-6px)' } 
+            }, 
+            shine: { 
+              '0%': { backgroundPosition: '-200% 0' }, 
+              '100%': { backgroundPosition: '200% 0' } 
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 5px rgba(59, 130, 246, 0.5)' },
+              '50%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6)' }
+            },
+            bounceIn: {
+              '0%': { transform: 'scale(0.3)', opacity: '0' },
+              '50%': { transform: 'scale(1.05)' },
+              '70%': { transform: 'scale(0.9)' },
+              '100%': { transform: 'scale(1)', opacity: '1' }
+            },
+            shake: {
+              '0%, 100%': { transform: 'translateX(0)' },
+              '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-5px)' },
+              '20%, 40%, 60%, 80%': { transform: 'translateX(5px)' }
+            },
+            zoomIn: {
+              '0%': { transform: 'scale(0.5)', opacity: '0' },
+              '100%': { transform: 'scale(1)', opacity: '1' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            },
+            fire: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+              '50%': { transform: 'scale(1.1)', opacity: '1' }
+            },
+            comboPulse: {
+              '0%, 100%': { 
+                transform: 'scale(1)',
+                boxShadow: '0 0 10px rgba(255, 215, 0, 0.7)'
+              },
+              '50%': { 
+                transform: 'scale(1.1)',
+                boxShadow: '0 0 25px rgba(255, 215, 0, 0.9), 0 0 40px rgba(255, 140, 0, 0.7)'
+              }
+            },
+            levelUp: {
+              '0%': { 
+                transform: 'scale(0.1) rotate(0deg)', 
+                opacity: '0' 
+              },
+              '50%': { 
+                transform: 'scale(1.2) rotate(180deg)',
+                opacity: '0.8'
+              },
+              '100%': { 
+                transform: 'scale(1) rotate(360deg)',
+                opacity: '1'
+              }
+            },
+            badgeUnlock: {
+              '0%': { 
+                transform: 'scale(0.5) rotateY(0deg)', 
+                filter: 'brightness(0.5)'
+              },
+              '50%': { 
+                transform: 'scale(1.2) rotateY(180deg)',
+                filter: 'brightness(1.5) drop-shadow(0 0 20px gold)'
+              },
+              '100%': { 
+                transform: 'scale(1) rotateY(360deg)',
+                filter: 'brightness(1) drop-shadow(0 0 10px gold)'
+              }
+            },
+            streakFire: {
+              '0%, 100%': { 
+                backgroundPosition: '0% 50%',
+                boxShadow: '0 0 15px rgba(255, 69, 0, 0.7)'
+              },
+              '50%': { 
+                backgroundPosition: '100% 50%',
+                boxShadow: '0 0 25px rgba(255, 69, 0, 0.9), 0 0 40px rgba(255, 140, 0, 0.7)'
+              }
+            }
+          } 
+        } 
+      },
+      safelist: [
+        'text-gray-900','text-gray-800','text-gray-700','text-gray-600',
+        'text-emerald-500','border-emerald-400','bg-emerald-100',
+        'text-amber-500','border-amber-400','bg-amber-100',
+        'text-rose-500','border-rose-400','bg-rose-100',
+        'text-cyan-500','border-cyan-400','bg-cyan-100',
+        'text-purple-500','border-purple-400','bg-purple-100',
+        'animate-pulse-glow', 'animate-bounce-in', 'animate-shake',
+        'animate-zoom-in', 'animate-slide-up', 'animate-fire',
+        'animate-combo-pulse', 'animate-level-up', 'animate-badge-unlock',
+        'animate-streak-fire'
+      ]
+    }
+  </script>
+
+  <style>
+    /* LIGHT THEME TOKENS with reduced intensity */
+    :root {
+      --bg: #FAFBFF;
+      --bg-elev: rgba(255,255,255,0.98);
+      --card-border: rgba(99, 102, 241, 0.15);
+      --fg: #000000;
+      --muted: rgba(0, 0, 0, 0.85);
+      --muted-2: rgba(0, 0, 0, 0.65);
+      --accent-1: #8B5CF6;
+      --accent-2: #06B6D4;
+      --accent-3: #F97316;
+      --ok: #10B981;
+      --warn: #F59E0B;
+      --danger: #EF4444;
+      --sos-ring: rgba(239, 68, 68, 0.25);
+      --mesh-a: rgba(139, 92, 246, 0.08);
+      --mesh-b: rgba(6, 182, 212, 0.06);
+      --mesh-c: rgba(249, 115, 22, 0.05);
+    }
+    body[data-theme="pastel"] { 
+      --bg: #F8FAFF;
+      --bg-elev: rgba(255,255,255,0.96);
+      --fg: #000000;
+      --muted: rgba(0, 0, 0, 0.9);
+      --muted-2: rgba(0, 0, 0, 0.7);
+      --accent-1: #A78BFA;
+      --accent-2: #38BDF8;
+      --accent-3: #FB7185;
+      --ok: #34D399;
+      --warn: #FBBF24;
+      --danger: #F87171;
+      --sos-ring: rgba(248, 113, 113, 0.25);
+      --mesh-a: rgba(167, 139, 250, 0.06);
+      --mesh-b: rgba(56, 189, 248, 0.05);
+      --mesh-c: rgba(251, 113, 133, 0.04);
+    }
+    body[data-theme="contrast"] { 
+      --bg: #FFFFFF;
+      --bg-elev: #F9FAFB;
+      --fg: #000000;
+      --muted: #000000;
+      --muted-2: #111827;
+      --accent-1: #0066FF;
+      --accent-2: #00D4AA;
+      --accent-3: #FF6B00;
+      --ok: #059669;
+      --warn: #D97706;
+      --danger: #DC2626;
+      --sos-ring: rgba(220, 38, 38, 0.25);
+      --mesh-a: rgba(0, 102, 255, 0.06);
+      --mesh-b: rgba(0, 212, 170, 0.05);
+      --mesh-c: rgba(255, 107, 0, 0.05);
+    }
+
+    html,body{ height:100%; }
+    body{
+      background:
+        radial-gradient(1000px 600px at -10% -10%, var(--mesh-a), transparent 60%),
+        radial-gradient(800px 500px at 110% 0%, var(--mesh-b), transparent 60%),
+        radial-gradient(900px 600px at 50% 120%, var(--mesh-c), transparent 60%),
+        var(--bg);
+      background-attachment: fixed; 
+      color: var(--fg);
+      padding-top: 20px;
+      padding-bottom: 120px;
+    }
+    .card{ 
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9)); 
+      border: 1px solid var(--card-border); 
+      backdrop-filter: blur(8px); 
+      border-radius: 1.25rem; 
+      box-shadow: 
+        0 4px 16px rgba(99, 102, 241, 0.08),
+        0 1px 4px rgba(99, 102, 241, 0.04),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .tile{ 
+      border: 1px solid var(--card-border); 
+      background: rgba(255,255,255,0.85); 
+      border-radius: 1rem; 
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .btn-gradient{ 
+      background-image: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3)); 
+      background-size: 200% 200%; 
+      color: white; 
+      font-weight: 800; 
+      border-radius: .9rem; 
+      box-shadow: 
+        0 8px 24px color-mix(in oklab, var(--accent-1) 35%, transparent), 
+        0 6px 18px color-mix(in oklab, var(--accent-2) 25%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+      transition: transform .2s ease, box-shadow .2s ease; 
+      animation: gradientX 14s ease infinite; 
+    }
+    .btn-gradient:hover{ 
+      transform: translateY(-2px) scale(1.02); 
+      box-shadow: 
+        0 12px 32px color-mix(in oklab, var(--accent-1) 45%, transparent), 
+        0 8px 24px color-mix(in oklab, var(--accent-2) 35%, transparent),
+        inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+    .neon-title{ 
+      background: linear-gradient(90deg, 
+        color-mix(in oklab, var(--accent-1) 80%, white 10%), 
+        var(--accent-2), 
+        color-mix(in oklab, var(--accent-3) 85%, white 5%), 
+        color-mix(in oklab, var(--accent-1) 80%, white 10%)); 
+      background-size: 300% 100%; 
+      -webkit-background-clip: text; 
+      background-clip: text; 
+      color: transparent; 
+      animation: shine 6s linear infinite; 
+      text-shadow: 0 0 20px color-mix(in oklab, var(--accent-1) 30%, transparent);
+    }
+    .glass-pill{ 
+      background: rgba(255,255,255,0.8); 
+      border: 1px solid var(--card-border); 
+      box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.9),
+        0 2px 8px rgba(99, 102, 241, 0.1); 
+      border-radius: 9999px; 
+      color: var(--fg); 
+    }
+    .progress-rail{ 
+      background: rgba(243, 244, 246, 0.8); 
+      border: 1px solid var(--card-border); 
+      border-radius: 9999px; 
+      overflow: hidden; 
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .progress-fill{ 
+      height: 1rem; 
+      border-radius: 9999px; 
+      background-image: linear-gradient(90deg, var(--accent-2), var(--accent-1), var(--accent-3)); 
+      background-size: 300% 100%; 
+      animation: shine 3.5s linear infinite; 
+      box-shadow: 
+        0 0 0 2px color-mix(in oklab, var(--accent-1) 25%, transparent), 
+        0 0 16px color-mix(in oklab, var(--accent-2) 25%, transparent) inset,
+        0 2px 4px rgba(0,0,0,0.1);
+    }
+    .sos-glow{ 
+      box-shadow: 
+        0 0 0 6px var(--sos-ring), 
+        0 0 42px var(--sos-ring),
+        0 8px 32px rgba(0,0,0,0.15);
+    }
+    .page{ display:none; }
+    .page.active{ display:block; animation: fadeIn .3s ease; }
+    @keyframes fadeIn{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+    /* Enhanced cyberpunk elements */
+    .cyber-border {
+      position: relative;
+    }
+    .cyber-border::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(45deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-1));
+      border-radius: inherit;
+      z-index: -1;
+      opacity: 0.6;
+      filter: blur(8px);
+    }
+
+    /* Floating header styles */
+    .floating-header {
+      margin: 0 auto 2rem auto;
+      border-radius: 1.5rem;
+      box-shadow: 
+        0 20px 40px rgba(99, 102, 241, 0.15),
+        0 8px 24px rgba(99, 102, 241, 0.1);
+      transition: all 0.3s ease;
+      background: linear-gradient(180deg, rgba(250,251,255,0.98), rgba(248,250,255,0.95)) !important;
+    }
+    .floating-header:hover {
+      box-shadow: 
+        0 25px 50px rgba(99, 102, 241, 0.2),
+        0 12px 32px rgba(99, 102, 241, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Ensure content has enough space at the bottom */
+    .main-content {
+      min-height: calc(100vh - 200px);
+      padding-bottom: 2rem;
+    }
+
+    /* Vitals input styles */
+    .vital-input {
+      background: transparent;
+      border: none;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.125rem;
+      width: 100%;
+      color: var(--fg);
+      outline: none;
+      padding: 0.25rem;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .vital-input:focus {
+      background: color-mix(in oklab, var(--accent-1) 10%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent-1) 30%, transparent);
+    }
+    .vital-input:hover {
+      background: color-mix(in oklab, var(--accent-1) 5%, transparent);
+    }
+
+    /* Language specific styles */
+    .hindi { font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', sans-serif; }
+    .bengali { font-family: 'Noto Sans Bengali', 'SolaimanLipi', 'Arial Unicode MS', sans-serif; }
+    .telugu { font-family: 'Noto Sans Telugu', 'Gautami', 'Arial Unicode MS', sans-serif; }
+    .tamil { font-family: 'Noto Sans Tamil', 'Latha', 'Arial Unicode MS', sans-serif; }
+    .gujarati { font-family: 'Noto Sans Gujarati', 'Shruti', 'Arial Unicode MS', sans-serif; }
+    .marathi { font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', sans-serif; }
+    .punjabi { font-family: 'Noto Sans Gurmukhi', 'Raavi', 'Arial Unicode MS', sans-serif; }
+    .kannada { font-family: 'Noto Sans Kannada', 'Tunga', 'Arial Unicode MS', sans-serif; }
+    .malayalam { font-family: 'Noto Sans Malayalam', 'Kartika', 'Arial Unicode MS', sans-serif; }
+    .odia { font-family: 'Noto Sans Oriya', 'Kalinga', 'Arial Unicode MS', sans-serif; }
+
+    .lang-text {
+      transition: all 0.3s ease;
+    }
+
+    /* SOS Alert Styles */
+    .sos-alert {
+      background: radial-gradient(120px 120px at 50% 40%, color-mix(in oklab, var(--danger) 60%, transparent), color-mix(in oklab, var(--danger) 25%, transparent));
+      color: white;
+      animation: sosPulse 2s infinite;
+    }
+    
+    @keyframes sosPulse {
+      0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--danger) 70%, transparent); }
+      70% { box-shadow: 0 0 0 20px color-mix(in oklab, var(--danger) 0%, transparent); }
+      100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--danger) 0%, transparent); }
+    }
+    
+    .sos-sent-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--danger);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 1rem;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: fadeInOut 3s forwards;
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Gamification Styles */
+    .level-up-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: levelUpBackground 1.5s ease-out forwards;
+    }
+    
+    @keyframes levelUpBackground {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; display: none; }
+    }
+    
+    .level-up-content {
+      text-align: center;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      color: white;
+      animation: levelUpContent 1.5s ease-out;
+    }
+    
+    @keyframes levelUpContent {
+      0% { transform: scale(0.1) rotate(0deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+      100% { transform: scale(1) rotate(360deg); opacity: 1; }
+    }
+    
+    .combo-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: bold;
+      z-index: 100;
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+      animation: comboPulse 0.8s ease-in-out infinite;
+    }
+    
+    .badge-unlocked {
+      animation: badgeUnlock 1s ease-out;
+    }
+    
+    .streak-fire {
+      background: linear-gradient(135deg, #FF4500, #FF8C00, #FFD700);
+      background-size: 200% 200%;
+      animation: streakFire 2s ease-in-out infinite;
+    }
+    
+    .xp-bubble {
+      position: absolute;
+      background: gold;
+      color: black;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.8rem;
+      animation: xpBubble 1.5s ease-out forwards;
+      z-index: 10;
+    }
+    
+    @keyframes xpBubble {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+    }
+    
+    .fire-effect {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,69,0,0.3) 0%, transparent 70%);
+      border-radius: inherit;
+      animation: fire 1.5s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    .leaderboard-item {
+      transition: all 0.3s ease;
+    }
+    
+    .leaderboard-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .user-rank-1 {
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+    }
+    
+    .user-rank-2 {
+      background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+      color: #000;
+    }
+    
+    .user-rank-3 {
+      background: linear-gradient(135deg, #CD7F32, #A56C28);
+      color: #000;
+    }
+    
+    .mystery-box {
+      background: linear-gradient(135deg, #8B5CF6, #06B6D4, #F97316);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mystery-box::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: rotate(45deg);
+      animation: shine 3s linear infinite;
+    }
+    
+    .mystery-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
+    }
+    
+    .share-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    
+    .share-card img {
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive header styles */
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    .header-user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      width: 100%;
+      margin-top: 1rem;
+      justify-content: space-between;
+    }
+
+    @media (min-width: 768px) {
+      .header-controls {
+        width: auto;
+        margin-top: 0;
+        justify-content: flex-end;
+      }
+    }
+
+    .header-vitals {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.5rem 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .header-vitals {
+        justify-content: center;
+      }
+      
+      .header-vitals > div {
+        flex: 1 0 45%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    /* Mobile menu button */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: block;
+      }
+      
+      .header-stats {
+        display: none;
+      }
+      
+      .mobile-menu-open .header-stats {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+        gap: 0.5rem;
+      }
+      
+      .mobile-menu-open .header-controls {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1rem;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+
+  <!-- Google Fonts for Indian languages -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&family=Noto+Sans+Tamil:wght@400;500;700&family=Noto+Sans+Gujarati:wght@400;500;700&family=Noto+Sans+Gurmukhi:wght@400;500;700&family=Noto+Sans+Kannada:wght@400;500;700&family=Noto+Sans+Malayalam:wght@400;500;700&family=Noto+Sans+Oriya:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body data-theme="neon">
+  <!-- Level Up Animation Container -->
+  <div id="level-up-animation" class="level-up-animation" style="display: none;">
+    <div class="level-up-content">
+      <h2 class="text-4xl font-bold mb-4">LEVEL UP!</h2>
+      <p class="text-2xl mb-2">You've reached Level <span id="new-level-display">5</span></p>
+      <p class="text-lg">+<span id="level-reward-xp">50</span> XP • +<span id="level-reward-coins">10</span> Health Coins</p>
+      <div class="mt-4">
+        <button id="close-level-up" class="bg-white text-purple-600 px-6 py-2 rounded-full font-bold">Awesome!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combo Indicator -->
+  <div id="combo-indicator" class="combo-indicator" style="display: none;">
+    COMBO x<span id="combo-count">1</span>
+  </div>
+
+  <!-- XP Bubbles Container -->
+  <div id="xp-bubbles-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;"></div>
+
+  <!-- Header - Responsive version -->
+  <header id="floating-header" class="max-w-5xl mx-auto floating-header" style="border-color: color-mix(in oklab, var(--accent-1) 20%, transparent)">
+    <div class="header-top">
+      <div class="header-user-info">
+        <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl tile cyber-border">
+          <i data-lucide="compass" class="w-6 h-6" style="color: var(--accent-1)"></i>
+        </span>
+        <div>
+          <p class="text-2xl font-black tracking-tight">Hello, <span id="header-user-name" class="neon-title">Rohan Choure</span></p>
+          <p class="text-xs flex items-center gap-2" style="color: var(--muted-2)"><i data-lucide="sun" class="w-4 h-4"></i><span id="greeting-text">Good Morning!</span></p>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Toggle menu">
+        <i data-lucide="menu" class="w-6 h-6" style="color: var(--accent-1)"></i>
+      </button>
+
+      <!-- Gamification Stats with Settings - Desktop -->
+      <div class="header-stats">
+        <div class="flex items-center gap-2 glass-pill px-3 py-1">
+          <i data-lucide="flame" class="w-4 h-4" style="color: var(--accent-3)"></i>
+          <span class="text-sm font-bold" id="header-streak">3</span>
+        </div>
+        <div class="flex items-center gap-2 glass-pill px-3 py-1">
+          <i data-lucide="award" class="w-4 h-4" style="color: var(--accent-2)"></i>
+          <span class="text-sm font-bold" id="header-level">5</span>
+        </div>
+        <div class="flex items-center gap-2 glass-pill px-3 py-1">
+          <i data-lucide="star" class="w-4 h-4" style="color: var(--warn)"></i>
+          <span class="text-sm font-bold" id="header-xp">150/200</span>
+        </div>
+        
+        <!-- Settings Icon in Header -->
+        <button onclick="changePage('settings', null)" class="flex items-center gap-2 glass-pill px-3 py-2 hover:scale-105 transition-transform" type="button" aria-label="Settings">
+          <i data-lucide="settings" class="w-4 h-4" style="color: var(--accent-1)"></i>
+          <span class="text-sm font-semibold lang-text" data-key="nav.settings" style="color: #000000">Settings</span>
+        </button>
+      </div>
+
+      <!-- LANGUAGE & THEME SWITCHER -->
+      <div class="header-controls">
+        <div class="flex items-center gap-2">
+          <label for="language-select" class="text-xs" style="color: var(--muted-2)">Language</label>
+          <select id="language-select" class="glass-pill px-3 py-2 text-sm font-semibold">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="te">తెలుగు (Telugu)</option>
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="gu">ગુજરાતી (Gujarati)</option>
+            <option value="mr">मराठी (Marathi)</option>
+            <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+            <option value="kn">ಕನ್ನಡ (Kannada)</option>
+            <option value="ml">മലയാളം (Malayalam)</option>
+            <option value="or">ଓଡ଼ିଆ (Odia)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="theme-select" class="text-xs" style="color: var(--muted-2)">Theme</label>
+          <select id="theme-select" class="glass-pill px-3 py-2 text-sm font-semibold">
+            <option value="neon">Neon</option>
+            <option value="pastel">Pastel</option>
+            <option value="contrast">High‑Contrast</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="header-vitals" id="header-vitals-display"></div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-5xl mx-auto pt-4 main-content">
+    <!-- HOME -->
+    <section id="page-home" class="page active">
+      <div id="home-content"></div>
+    </section>
+
+    <!-- TODO -->
+    <section id="page-todo" class="page">
+      <div id="todo-content"></div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="page-progress" class="page">
+      <div id="progress-content"></div>
+    </section>
+
+    <!-- GAMIFICATION -->
+    <section id="page-gamification" class="page">
+      <div id="gamification-content"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="page-settings" class="page">
+      <div id="settings-content"></div>
+    </section>
+  </main>
+
+  <!-- Bottom Nav (Settings removed from here) -->
+  <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 h-20 flex justify-around items-center border-t" style="background: linear-gradient(180deg, rgba(250,251,255,0.98), rgba(248,250,255,0.95)); backdrop-filter: blur(12px); border-color: color-mix(in oklab, var(--accent-1) 20%, transparent)" role="navigation" aria-label="Primary">
+    <button onclick="changePage('home', this)" class="nav-item flex flex-col items-center justify-center active" aria-current="page" type="button">
+      <i data-lucide="home" class="w-7 h-7" style="color: var(--accent-1)"></i>
+      <span class="text-[11px] font-semibold lang-text" data-key="nav.home" style="color: #000000">Home</span>
+    </button>
+    <button onclick="changePage('todo', this)" class="nav-item flex flex-col items-center justify-center" type="button">
+      <i data-lucide="list-checks" class="w-7 h-7" style="color: var(--accent-1)"></i>
+      <span class="text-[11px] font-semibold lang-text" data-key="nav.todo" style="color: #000000">To Do</span>
+    </button>
+
+    <div id="alert-center-btn-wrapper" class="flex-shrink-0">
+      <button id="alert-center-btn" class="w-20 h-20 rounded-2xl grid place-items-center text-white text-3xl font-bold transform transition duration-150 sos-alert cyber-border" ontouchstart="handleAlertHoldStart(event)" ontouchend="handleAlertHoldEnd(event)" onmousedown="handleAlertHoldStart(event)" onmouseup="handleAlertHoldEnd(event)" ontouchmove="handleAlertHoldMove(event)" aria-label="Hold to send SOS" type="button">
+        <i data-lucide="siren" class="w-8 h-8 absolute transition-opacity duration-300 opacity-100" id="siren-icon"></i>
+        <span id="countdown-display" class="text-white text-4xl font-extrabold opacity-0 transition-opacity duration-300">3</span>
+      </button>
+    </div>
+
+    <button onclick="changePage('progress', this)" class="nav-item flex flex-col items-center justify-center" type="button">
+      <i data-lucide="trending-up" class="w-7 h-7" style="color: var(--accent-1)"></i>
+      <span class="text-[11px] font-semibold lang-text" data-key="nav.progress" style="color: #000000">Progress</span>
+    </button>
+    <button onclick="changePage('gamification', this)" class="nav-item flex flex-col items-center justify-center" type="button">
+      <i data-lucide="gamepad-2" class="w-7 h-7" style="color: var(--accent-1)"></i>
+      <span class="text-[11px] font-semibold lang-text" data-key="nav.gamification" style="color: #000000">Game</span>
+    </button>
+  </nav>
+
+  <script>
+    // ===================
+    // State & Utilities
+    // ===================
+    const TODAY_DATE_KEY = new Date().toDateString();
+    const toTimeLabel = (m) => { const h=Math.floor(m/60), mm=m%60; const d=new Date(2000,0,1,h,mm); return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); };
+    const nowMinutes = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
+
+    const THEME_TOKENS = {
+      neon: { bg:'#FAFBFF', fg:'#000000', muted:'#000000D9', muted2:'#000000A6', primary:'#8B5CF6', secondary:'#06B6D4', accent:'#F97316', ok:'#10B981', warn:'#F59E0B', danger:'#EF4444' },
+      pastel: { bg:'#F8FAFF', fg:'#000000', muted:'#000000E6', muted2:'#000000B3', primary:'#A78BFA', secondary:'#38BDF8', accent:'#FB7185', ok:'#34D399', warn:'#FBBF24', danger:'#F87171' },
+      contrast: { bg:'#FFFFFF', fg:'#000000', muted:'#000000', muted2:'#111827', primary:'#0066FF', secondary:'#00D4AA', accent:'#FF6B00', ok:'#059669', warn:'#D97706', danger:'#DC2626' }
+    };
+
+    // ===================
+    // Gamification Engine
+    // ===================
+    const GAMIFICATION_CONFIG = {
+      // XP system
+      xpPerTask: 10,
+      xpPerVital: 5,
+      xpPerMedication: 15,
+      xpPerStreakDay: 5,
+      
+      // Level system
+      levelThresholds: [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5000],
+      
+      // Combo system
+      comboTimeWindow: 5000, // 5 seconds
+      comboMultipliers: {
+        2: 1.2,
+        3: 1.5,
+        4: 2.0,
+        5: 3.0
+      },
+      
+      // Streak system
+      streakBonus: {
+        3: { xpMultiplier: 1.2, badge: 'streak-3' },
+        7: { xpMultiplier: 1.5, badge: 'streak-7' },
+        14: { xpMultiplier: 2.0, badge: 'streak-14' },
+        30: { xpMultiplier: 3.0, badge: 'streak-30' }
+      },
+      
+      // Badge system
+      badges: {
+        'first-checkin': { name: 'First Check-in', rarity: 'common', icon: 'CheckCircle' },
+        'streak-3': { name: '3-Day Streak', rarity: 'common', icon: 'Flame' },
+        'streak-7': { name: 'Weekly Warrior', rarity: 'uncommon', icon: 'Flame' },
+        'streak-14': { name: 'Fortnight Champion', rarity: 'rare', icon: 'Flame' },
+        'streak-30': { name: 'Monthly Master', rarity: 'epic', icon: 'Flame' },
+        'task-master': { name: 'Task Master', rarity: 'uncommon', icon: 'ListChecks' },
+        'vitals-pro': { name: 'Vitals Pro', rarity: 'uncommon', icon: 'Activity' },
+        'medication-adherent': { name: 'Medication Adherent', rarity: 'rare', icon: 'Pill' },
+        'level-5': { name: 'Level 5 Achiever', rarity: 'uncommon', icon: 'Award' },
+        'level-10': { name: 'Level 10 Master', rarity: 'rare', icon: 'Award' },
+        'combo-5': { name: 'Combo Master', rarity: 'rare', icon: 'Zap' },
+        'perfect-week': { name: 'Perfect Week', rarity: 'epic', icon: 'Calendar' },
+        'health-champion': { name: 'Health Champion', rarity: 'legendary', icon: 'Trophy' }
+      },
+      
+      // Mystery rewards
+      mysteryRewards: [
+        { type: 'xp', value: 50, probability: 0.4 },
+        { type: 'xp', value: 100, probability: 0.2 },
+        { type: 'badge-shard', value: 'health-champion', probability: 0.1 },
+        { type: 'streak-protection', value: 1, probability: 0.2 },
+        { type: 'xp-boost', value: 2, probability: 0.1 }
+      ]
+    };
+
+    // Sound effects
+    const SOUNDS = {
+      levelUp: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'] }),
+      badgeUnlock: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3'] }),
+      taskComplete: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3'] }),
+      combo: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-extra-bonus-in-a-video-game-2043.mp3'] }),
+      streak: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'] })
+    };
+
+    // ===================
+    // Multi-language Support
+    // ===================
+    const translations = {
+      en: {
+        // Navigation
+        'nav.home': 'Home',
+        'nav.todo': 'To Do',
+        'nav.progress': 'Progress',
+        'nav.gamification': 'Game',
+        'nav.settings': 'Settings',
+        
+        // Common
+        'common.greeting.morning': 'Good Morning!',
+        'common.greeting.afternoon': 'Good Afternoon!',
+        'common.greeting.evening': 'Good Evening!',
+        'common.compliance': 'Compliance Score',
+        'common.today': 'Today',
+        'common.tomorrow': 'Tomorrow',
+        'common.add': 'Add',
+        'common.save': 'Save',
+        'common.cancel': 'Cancel',
+        'common.edit': 'Edit',
+        'common.delete': 'Delete',
+        'common.share': 'Share',
+        'common.export': 'Export',
+        'common.insight': 'Insight',
+        
+        // Home Page
+        'home.title': 'Health Dashboard',
+        'home.compliance.title': "Today's Compliance Score",
+        'home.vitals.title': 'Live Vitals',
+        'home.vitals.hr': 'Heart Rate',
+        'home.vitals.bp': 'Blood Pressure',
+        'home.vitals.bg': 'Blood Glucose',
+        'home.vitals.spo2': 'Oxygen Saturation',
+        'home.vitals.share': 'Share with Care Team',
+        'home.medication.title': 'Medication Tracker',
+        'home.medication.doses': 'Doses Taken Today',
+        'home.medication.next': 'Next Dose',
+        'home.activity.title': 'Daily Activity',
+        'home.activity.steps': 'Steps',
+        'home.activity.water': 'Water (glasses)',
+        'home.activity.sleep': 'Sleep',
+        
+        // Alerts
+        'alerts.bp': 'ALERT: BP reading slightly high. Please recheck in 30 mins.',
+        'alerts.doctor': 'Gentle Reminder: Doctor visit tomorrow at 10 AM.',
+        
+        // To-Do Page
+        'todo.title': 'My Health Milestones Today',
+        'todo.remaining': 'milestones left',
+        'todo.add.title': 'Add New Milestone',
+        'todo.add.placeholder': 'Task Title (e.g., Take BP Pill)',
+        'todo.add.type': 'Task Type',
+        'todo.add.submit': 'Add Milestone',
+        'todo.preview.title': "Tomorrow's Preview",
+        'todo.status.complete': 'Complete',
+        'todo.status.pending': 'Pending',
+        'todo.status.upcoming': 'Upcoming',
+        
+        // Progress Page
+        'progress.title': 'Your Progress',
+        'progress.streak': 'Current Streak',
+        'progress.streak.days': 'days',
+        'progress.level': 'Your Current Health Level:',
+        'progress.badges': 'Badges Earned',
+        'progress.risk.title': 'Risk Forecasting',
+        'progress.risk.insight': 'Insight: Keep your adherence above 80% to maintain a low-risk status.',
+        
+        // Gamification Page
+        'gamification.title': 'Health Adventure',
+        'gamification.level': 'Level',
+        'gamification.xp': 'XP',
+        'gamification.streak': 'Day Streak',
+        'gamification.combo': 'Combo',
+        'gamification.leaderboard': 'Leaderboard',
+        'gamification.badges': 'Badges Collection',
+        'gamification.mysteryBox': 'Mystery Box',
+        'gamification.rewards': 'Daily Rewards',
+        'gamification.share': 'Share Achievement',
+        
+        // Settings Page
+        'settings.title': 'Settings & Reports',
+        'settings.profile.title': 'Profile Settings',
+        'settings.profile.name': 'Full Name',
+        'settings.profile.dob': 'Date of Birth',
+        'settings.profile.conditions': 'Health Conditions',
+        'settings.profile.medications': 'Current Medications',
+        'settings.profile.emergency': 'Emergency Contact',
+        'settings.connections.title': 'Connection Settings',
+        'settings.export.title': 'ABDM Data Export',
+        'settings.export.description': 'Export your health data in ABDM-compatible format for sharing with healthcare providers.',
+        'settings.export.health': 'Health Data Summary',
+        'settings.export.meds': 'Medication History',
+        'settings.share.title': 'Share Progress',
+        'settings.share.description': 'Securely share your health summary.',
+        'settings.share.family': 'Send to Family',
+        'settings.share.doctor': 'Send to Doctor',
+        
+        // Medical Terms
+        'medical.bpm': 'BPM',
+        'medical.mmhg': 'mmHg',
+        'medical.mgdl': 'mg/dL',
+        'medical.spo2': 'SpO₂ %',
+        
+        // SOS Alert
+        'sos.sent': 'SOS has been sent to your connections!',
+        'sos.hold': 'Hold for 3 seconds to send SOS'
+      },
+      hi: {
+        // Navigation
+        'nav.home': 'होम',
+        'nav.todo': 'कार्य सूची',
+        'nav.progress': 'प्रगति',
+        'nav.gamification': 'गेम',
+        'nav.settings': 'सेटिंग्स',
+        
+        // Common
+        'common.greeting.morning': 'सुप्रभात!',
+        'common.greeting.afternoon': 'नमस्कार!',
+        'common.greeting.evening': 'शुभ संध्या!',
+        'common.compliance': 'अनुपालन स्कोर',
+        'common.today': 'आज',
+        'common.tomorrow': 'कल',
+        'common.add': 'जोड़ें',
+        'common.save': 'सेव करें',
+        'common.cancel': 'रद्द करें',
+        'common.edit': 'संपादित करें',
+        'common.delete': 'हटाएं',
+        'common.share': 'साझा करें',
+        'common.export': 'निर्यात',
+        'common.insight': 'अंतर्दृष्टि',
+        
+        // Home Page
+        'home.title': 'स्वास्थ्य डैशबोर्ड',
+        'home.compliance.title': 'आज का अनुपालन स्कोर',
+        'home.vitals.title': 'लाइव वाइटल्स',
+        'home.vitals.hr': 'हृदय गति',
+        'home.vitals.bp': 'ब्लड प्रेशर',
+        'home.vitals.bg': 'ब्लड शुगर',
+        'home.vitals.spo2': 'ऑक्सीजन स्तर',
+        'home.vitals.share': 'केयर टीम के साथ साझा करें',
+        'home.medication.title': 'दवाई ट्रैकर',
+        'home.medication.doses': 'आज ली गई खुराक',
+        'home.medication.next': 'अगली खुराक',
+        'home.activity.title': 'दैनिक गतिविधि',
+        'home.activity.steps': 'कदम',
+        'home.activity.water': 'पानी (गिलास)',
+        'home.activity.sleep': 'नींद',
+        
+        // Alerts
+        'alerts.bp': 'अलर्ट: बीपी रीडिंग थोड़ी अधिक है। कृपया 30 मिनट में फिर से जांचें।',
+        'alerts.doctor': 'स्मरण: कल सुबह 10 बजे डॉक्टर से मिलने जाना है।',
+        
+        // To-Do Page
+        'todo.title': 'आज के मेरे स्वास्थ्य लक्ष्य',
+        'todo.remaining': 'लक्ष्य शेष',
+        'todo.add.title': 'नया लक्ष्य जोड़ें',
+        'todo.add.placeholder': 'कार्य का नाम (जैसे, बीपी की दवा लें)',
+        'todo.add.type': 'कार्य प्रकार',
+        'todo.add.submit': 'लक्ष्य जोड़ें',
+        'todo.preview.title': 'कल का पूर्वावलोकन',
+        'todo.status.complete': 'पूर्ण',
+        'todo.status.pending': 'लंबित',
+        'todo.status.upcoming': 'आगामी',
+        
+        // Progress Page
+        'progress.title': 'आपकी प्रगति',
+        'progress.streak': 'वर्तमान स्ट्रीक',
+        'progress.streak.days': 'दिन',
+        'progress.level': 'आपका वर्तमान स्वास्थ्य स्तर:',
+        'progress.badges': 'अर्जित बैज',
+        'progress.risk.title': 'जोखिम पूर्वानुमान',
+        'progress.risk.insight': 'अंतर्दृष्टि: कम जोखिम स्थिति बनाए रखने के लिए अपने अनुपालन को 80% से ऊपर रखें।',
+        
+        // Gamification Page
+        'gamification.title': 'स्वास्थ्य साहसिक',
+        'gamification.level': 'स्तर',
+        'gamification.xp': 'एक्सपी',
+        'gamification.streak': 'दिन स्ट्रीक',
+        'gamification.combo': 'कॉम्बो',
+        'gamification.leaderboard': 'लीडरबोर्ड',
+        'gamification.badges': 'बैज संग्रह',
+        'gamification.mysteryBox': 'रहस्य बॉक्स',
+        'gamification.rewards': 'दैनिक पुरस्कार',
+        'gamification.share': 'उपलब्धि साझा करें',
+        
+        // Settings Page
+        'settings.title': 'सेटिंग्स और रिपोर्ट्स',
+        'settings.profile.title': 'प्रोफाइल सेटिंग्स',
+        'settings.profile.name': 'पूरा नाम',
+        'settings.profile.dob': 'जन्मतिथि',
+        'settings.profile.conditions': 'स्वास्थ्य स्थितियां',
+        'settings.profile.medications': 'वर्तमान दवाएं',
+        'settings.profile.emergency': 'आपातकालीन संपर्क',
+        'settings.connections.title': 'कनेक्शन सेटिंग्स',
+        'settings.export.title': 'एबीडीएम डेटा निर्यात',
+        'settings.export.description': 'स्वास्थ्य सेवा प्रदाताओं के साथ साझा करने के लिए एबीडीएम-संगत प्रारूप में अपना स्वास्थ्य डेटा निर्यात करें।',
+        'settings.export.health': 'स्वास्थ्य डेटा सारांश',
+        'settings.export.meds': 'दवाई इतिहास',
+        'settings.share.title': 'प्रगति साझा करें',
+        'settings.share.description': 'अपना स्वास्थ्य सारांश सुरक्षित रूप से साझा करें।',
+        'settings.share.family': 'परिवार को भेजें',
+        'settings.share.doctor': 'डॉक्टर को भेजें',
+        
+        // Medical Terms
+        'medical.bpm': 'बीपीएम',
+        'medical.mmhg': 'mmHg',
+        'medical.mgdl': 'mg/dL',
+        'medical.spo2': 'SpO₂ %',
+        
+        // SOS Alert
+        'sos.sent': 'एसओएस आपके कनेक्शन को भेज दिया गया है!',
+        'sos.hold': 'एसओएस भेजने के लिए 3 सेकंड तक होल्ड करें'
+      }
+      // Additional languages would be added here...
+    };
+
+    const languageClasses = {
+      'en': '',
+      'hi': 'hindi',
+      'bn': 'bengali',
+      'te': 'telugu',
+      'ta': 'tamil',
+      'gu': 'gujarati',
+      'mr': 'marathi',
+      'pa': 'punjabi',
+      'kn': 'kannada',
+      'ml': 'malayalam',
+      'or': 'odia'
+    };
+
+    let currentLanguage = localStorage.getItem('rpmLanguage') || 'en';
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      localStorage.setItem('rpmLanguage', lang);
+      applyLanguage();
+      renderAllPages();
+    }
+
+    function applyLanguage() {
+      // Update HTML lang attribute
+      document.documentElement.lang = currentLanguage;
+      
+      // Apply language-specific font class
+      Object.values(languageClasses).forEach(cls => {
+        document.body.classList.remove(cls);
+      });
+      if (languageClasses[currentLanguage]) {
+        document.body.classList.add(languageClasses[currentLanguage]);
+      }
+      
+      // Update all elements with data-key attribute
+      document.querySelectorAll('[data-key]').forEach(element => {
+        const key = element.getAttribute('data-key');
+        if (translations[currentLanguage] && translations[currentLanguage][key]) {
+          element.textContent = translations[currentLanguage][key];
+          element.classList.add('lang-text');
+        }
+      });
+      
+      // Update greeting
+      updateGreeting();
+    }
+
+    function t(key) {
+      return translations[currentLanguage]?.[key] || translations['en'][key] || key;
+    }
+
+    function updateGreeting() {
+      const h = new Date().getHours();
+      let greetingKey = 'common.greeting.morning';
+      if (h >= 12 && h < 18) greetingKey = 'common.greeting.afternoon';
+      if (h >= 18) greetingKey = 'common.greeting.evening';
+      
+      document.getElementById('greeting-text').textContent = t(greetingKey);
+    }
+
+    // Enhanced initial state with gamification and medications
+    const INITIAL_STATE = {
+      profile: { 
+        name: 'Rohan Choure', 
+        dob: '1975-05-15', 
+        conditions: 'Hypertension, Type 2 Diabetes', 
+        emergencyContact: 'Avinash Hugar - (555) 123-4567',
+        medications: ['Aspirin 75mg', 'Metformin 500mg', 'Lisinopril 10mg']
+      },
+      tasks: [
+        { id:1, name:'Take Blood Pressure', icon:'Activity', isChecked:false, timeMM: 8*60, timeLabel:'08:00 AM' },
+        { id:2, name:'Check Blood Glucose', icon:'Activity', isChecked:false, timeMM: 8*60+30, timeLabel:'08:30 AM' },
+        { id:3, name:'Take Morning Medication', icon:'Pill', isChecked:false, timeMM: 9*60, timeLabel:'09:00 AM' },
+        { id:4, name:'30 min Walk/Exercise', icon:'Footprints', isChecked:false, timeMM: 17*60, timeLabel:'05:00 PM' },
+        { id:5, name:'Take Evening Medication', icon:'Pill', isChecked:false, timeMM: 20*60, timeLabel:'08:00 PM' }
+      ],
+      vitals: { hr:72, bp:'130/80', bg:105, spo2:97 },
+      medicationHistory: [
+        { date: 'Mon', meds: ['Aspirin (AM)', 'Metformin (AM)'], nextDose: 'Aspirin at 8:00 PM', dosesTaken: 2, totalDoses: 3 },
+        { date: 'Sun', meds: ['Aspirin (AM)', 'Metformin (AM)', 'Aspirin (PM)'], nextDose: 'Aspirin (AM)', dosesTaken: 3, totalDoses: 3 },
+      ],
+      // Enhanced gamification state
+      gamification: { 
+        level: 5,
+        xp: 150,
+        xpToNextLevel: 200,
+        streak: 3,
+        lastActivityDate: TODAY_DATE_KEY,
+        badges: ['first-checkin', 'streak-3'],
+        combo: 0,
+        lastComboTime: 0,
+        leaderboardPosition: 42,
+        healthCoins: 25,
+        dailyRewardsClaimed: [],
+        mysteryBoxesOpened: 0
+      },
+      healthData: [ 
+        {day:'Mon',score:75,risk:25},
+        {day:'Tue',score:80,risk:20},
+        {day:'Wed',score:85,risk:15},
+        {day:'Thu',score:90,risk:10},
+        {day:'Fri',score:50,risk:50},
+        {day:'Sat',score:95,risk:5},
+        {day:'Sun',score:98,risk:2} 
+      ],
+      currentPage:'home', 
+      lastUpdatedDate:TODAY_DATE_KEY, 
+      taskIdCounter:6, 
+      isVitalsEditing:false
+    };
+
+    let appState = JSON.parse(localStorage.getItem('rpmCoachStateDistributed')||'null') || INITIAL_STATE;
+    const save = () => localStorage.setItem('rpmCoachStateDistributed', JSON.stringify(appState));
+    const refreshIconsSoon = () => { if (typeof lucide==='undefined') return; requestAnimationFrame(()=>lucide.createIcons({attrs:{'stroke-width':2,'class':'lucide'}})); };
+    const calculateHealthScore = () => { const c=appState.tasks.filter(t=>t.isChecked).length; const total=appState.tasks.length; return total?Math.round((c/total)*100):0; };
+
+    // ===================
+    // Gamification Engine Functions
+    // ===================
+    
+    // Add XP with visual feedback
+    function addXP(amount, source, element) {
+      const multiplier = getXPMultiplier();
+      const finalAmount = Math.round(amount * multiplier);
+      
+      appState.gamification.xp += finalAmount;
+      
+      // Check for level up
+      checkLevelUp();
+      
+      // Update header display
+      updateGamificationHeader();
+      
+      // Create XP bubble animation
+      if (element) {
+        createXPBubble(finalAmount, element);
+      }
+      
+      // Check for combo
+      updateCombo();
+      
+      // Save state
+      save();
+      
+      return finalAmount;
+    }
+    
+    // Create XP bubble animation
+    function createXPBubble(amount, element) {
+      const rect = element.getBoundingClientRect();
+      const bubble = document.createElement('div');
+      bubble.className = 'xp-bubble';
+      bubble.textContent = `+${amount} XP`;
+      bubble.style.left = `${rect.left + rect.width/2 - 15}px`;
+      bubble.style.top = `${rect.top}px`;
+      
+      document.getElementById('xp-bubbles-container').appendChild(bubble);
+      
+      setTimeout(() => {
+        bubble.remove();
+      }, 1500);
+    }
+    
+    // Get XP multiplier based on streak and combo
+    function getXPMultiplier() {
+      let multiplier = 1;
+      
+      // Streak multiplier
+      const streak = appState.gamification.streak;
+      if (streak >= 30 && GAMIFICATION_CONFIG.streakBonus[30]) {
+        multiplier *= GAMIFICATION_CONFIG.streakBonus[30].xpMultiplier;
+      } else if (streak >= 14 && GAMIFICATION_CONFIG.streakBonus[14]) {
+        multiplier *= GAMIFICATION_CONFIG.streakBonus[14].xpMultiplier;
+      } else if (streak >= 7 && GAMIFICATION_CONFIG.streakBonus[7]) {
+        multiplier *= GAMIFICATION_CONFIG.streakBonus[7].xpMultiplier;
+      } else if (streak >= 3 && GAMIFICATION_CONFIG.streakBonus[3]) {
+        multiplier *= GAMIFICATION_CONFIG.streakBonus[3].xpMultiplier;
+      }
+      
+      // Combo multiplier
+      const combo = appState.gamification.combo;
+      if (combo >= 5 && GAMIFICATION_CONFIG.comboMultipliers[5]) {
+        multiplier *= GAMIFICATION_CONFIG.comboMultipliers[5];
+      } else if (combo >= 4 && GAMIFICATION_CONFIG.comboMultipliers[4]) {
+        multiplier *= GAMIFICATION_CONFIG.comboMultipliers[4];
+      } else if (combo >= 3 && GAMIFICATION_CONFIG.comboMultipliers[3]) {
+        multiplier *= GAMIFICATION_CONFIG.comboMultipliers[3];
+      } else if (combo >= 2 && GAMIFICATION_CONFIG.comboMultipliers[2]) {
+        multiplier *= GAMIFICATION_CONFIG.comboMultipliers[2];
+      }
+      
+      return multiplier;
+    }
+    
+    // Check for level up
+    function checkLevelUp() {
+      const currentLevel = appState.gamification.level;
+      const xp = appState.gamification.xp;
+      
+      // Find the next level threshold
+      let nextLevel = currentLevel;
+      for (let i = 0; i < GAMIFICATION_CONFIG.levelThresholds.length; i++) {
+        if (xp >= GAMIFICATION_CONFIG.levelThresholds[i]) {
+          nextLevel = i;
+        } else {
+          break;
+        }
+      }
+      
+      // If level increased, trigger level up
+      if (nextLevel > currentLevel) {
+        appState.gamification.level = nextLevel;
+        appState.gamification.xpToNextLevel = GAMIFICATION_CONFIG.levelThresholds[nextLevel + 1] || GAMIFICATION_CONFIG.levelThresholds[nextLevel] * 1.5;
+        
+        // Award health coins
+        const coinsEarned = nextLevel * 2;
+        appState.gamification.healthCoins += coinsEarned;
+        
+        // Show level up animation
+        showLevelUpAnimation(nextLevel, coinsEarned);
+        
+        // Check for level-based badges
+        checkBadgeUnlock(`level-${nextLevel}`);
+      }
+    }
+    
+    // Show level up animation
+    function showLevelUpAnimation(newLevel, coinsEarned) {
+      const animation = document.getElementById('level-up-animation');
+      const newLevelDisplay = document.getElementById('new-level-display');
+      const rewardXP = document.getElementById('level-reward-xp');
+      const rewardCoins = document.getElementById('level-reward-coins');
+      
+      newLevelDisplay.textContent = newLevel;
+      rewardXP.textContent = GAMIFICATION_CONFIG.levelThresholds[newLevel] - GAMIFICATION_CONFIG.levelThresholds[newLevel-1];
+      rewardCoins.textContent = coinsEarned;
+      
+      animation.style.display = 'flex';
+      
+      // Play sound
+      SOUNDS.levelUp.play();
+      
+      // Trigger confetti
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+    
+    // Close level up animation
+    document.getElementById('close-level-up').addEventListener('click', function() {
+      document.getElementById('level-up-animation').style.display = 'none';
+    });
+    
+    // Update combo system
+    function updateCombo() {
+      const now = Date.now();
+      const lastComboTime = appState.gamification.lastComboTime;
+      
+      // If within combo time window, increase combo
+      if (now - lastComboTime < GAMIFICATION_CONFIG.comboTimeWindow) {
+        appState.gamification.combo++;
+        
+        // Show combo indicator
+        showComboIndicator();
+        
+        // Check for combo badge
+        if (appState.gamification.combo === 5) {
+          checkBadgeUnlock('combo-5');
+        }
+      } else {
+        // Reset combo
+        appState.gamification.combo = 1;
+      }
+      
+      // Update last combo time
+      appState.gamification.lastComboTime = now;
+    }
+    
+    // Show combo indicator
+    function showComboIndicator() {
+      const comboIndicator = document.getElementById('combo-indicator');
+      const comboCount = document.getElementById('combo-count');
+      
+      comboCount.textContent = appState.gamification.combo;
+      comboIndicator.style.display = 'block';
+      
+      // Play combo sound for high combos
+      if (appState.gamification.combo >= 3) {
+        SOUNDS.combo.play();
+      }
+      
+      // Hide after 3 seconds
+      setTimeout(() => {
+        comboIndicator.style.display = 'none';
+      }, 3000);
+    }
+    
+    // Check and unlock badges
+    function checkBadgeUnlock(badgeId) {
+      if (!appState.gamification.badges.includes(badgeId) && GAMIFICATION_CONFIG.badges[badgeId]) {
+        appState.gamification.badges.push(badgeId);
+        
+        // Show badge unlock animation
+        showBadgeUnlockAnimation(badgeId);
+        
+        return true;
+      }
+      return false;
+    }
+    
+    // Show badge unlock animation
+    function showBadgeUnlockAnimation(badgeId) {
+      // Create a temporary element for the animation
+      const badge = GAMIFICATION_CONFIG.badges[badgeId];
+      const badgeElement = document.createElement('div');
+      badgeElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-2xl shadow-2xl text-center z-50 badge-unlocked';
+      badgeElement.innerHTML = `
+        <i data-lucide="${badge.icon}" class="w-16 h-16 mx-auto mb-4" style="color: var(--accent-1)"></i>
+        <h3 class="text-2xl font-bold mb-2">Badge Unlocked!</h3>
+        <p class="text-xl font-semibold mb-2">${badge.name}</p>
+        <p class="text-sm text-gray-600 capitalize">${badge.rarity} Badge</p>
+        <button class="mt-4 bg-purple-600 text-white px-4 py-2 rounded-full">Awesome!</button>
+      `;
+      
+      document.body.appendChild(badgeElement);
+      refreshIconsSoon();
+      
+      // Play sound
+      SOUNDS.badgeUnlock.play();
+      
+      // Auto-remove after 3 seconds
+      setTimeout(() => {
+        badgeElement.remove();
+      }, 3000);
+      
+      // Add click to close
+      badgeElement.querySelector('button').addEventListener('click', () => {
+        badgeElement.remove();
+      });
+    }
+    
+    // Update streak
+    function updateStreak() {
+      const today = new Date().toDateString();
+      const lastActivityDate = appState.gamification.lastActivityDate;
+      
+      // If last activity was yesterday, increment streak
+      const lastDate = new Date(lastActivityDate);
+      const todayDate = new Date(today);
+      const diffTime = Math.abs(todayDate - lastDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 1) {
+        // Consecutive day - increment streak
+        appState.gamification.streak++;
+        
+        // Check for streak badges
+        if (appState.gamification.streak === 3) {
+          checkBadgeUnlock('streak-3');
+        } else if (appState.gamification.streak === 7) {
+          checkBadgeUnlock('streak-7');
+        } else if (appState.gamification.streak === 14) {
+          checkBadgeUnlock('streak-14');
+        } else if (appState.gamification.streak === 30) {
+          checkBadgeUnlock('streak-30');
+        }
+        
+        // Play streak sound for significant streaks
+        if (appState.gamification.streak >= 7) {
+          SOUNDS.streak.play();
+        }
+      } else if (diffDays > 1) {
+        // Streak broken - reset to 1
+        appState.gamification.streak = 1;
+      }
+      // If same day, streak remains the same
+      
+      // Update last activity date
+      appState.gamification.lastActivityDate = today;
+    }
+    
+    // Update gamification header
+    function updateGamificationHeader() {
+      document.getElementById('header-streak').textContent = appState.gamification.streak;
+      document.getElementById('header-level').textContent = appState.gamification.level;
+      document.getElementById('header-xp').textContent = `${appState.gamification.xp}/${appState.gamification.xpToNextLevel}`;
+    }
+    
+    // Open mystery box
+    function openMysteryBox() {
+      if (appState.gamification.healthCoins < 10) {
+        alert("You need 10 Health Coins to open a Mystery Box!");
+        return;
+      }
+      
+      // Deduct coins
+      appState.gamification.healthCoins -= 10;
+      appState.gamification.mysteryBoxesOpened++;
+      
+      // Get random reward
+      const random = Math.random();
+      let cumulativeProbability = 0;
+      let reward = null;
+      
+      for (const r of GAMIFICATION_CONFIG.mysteryRewards) {
+        cumulativeProbability += r.probability;
+        if (random <= cumulativeProbability) {
+          reward = r;
+          break;
+        }
+      }
+      
+      // Apply reward
+      if (reward) {
+        let message = "";
+        
+        switch (reward.type) {
+          case 'xp':
+            const xpEarned = addXP(reward.value, 'mystery-box');
+            message = `You found ${xpEarned} XP!`;
+            break;
+          case 'badge-shard':
+            message = `You found a shard for the ${GAMIFICATION_CONFIG.badges[reward.value].name} badge!`;
+            break;
+          case 'streak-protection':
+            message = `You found a Streak Protection! Your streak won't break if you miss a day.`;
+            break;
+          case 'xp-boost':
+            message = `You found a ${reward.value}x XP Boost for your next activity!`;
+            break;
+        }
+        
+        // Show reward message
+        alert(`Mystery Box Reward!\n\n${message}`);
+      }
+      
+      save();
+      renderGamificationPage();
+    }
+    
+    // Share achievement
+    function shareAchievement(type, value) {
+      const shareCard = document.createElement('div');
+      shareCard.className = 'share-card animate-zoom-in';
+      shareCard.innerHTML = `
+        <h3 class="text-xl font-bold mb-2">Share Your Achievement!</h3>
+        <div class="flex items-center justify-center mb-4">
+          <i data-lucide="award" class="w-12 h-12 mr-3" style="color: var(--accent-1)"></i>
+          <div>
+            <p class="font-semibold">Level ${appState.gamification.level} Reached!</p>
+            <p class="text-sm text-gray-600">${appState.gamification.xp} XP • ${appState.gamification.streak} Day Streak</p>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">Share your health journey with friends and family!</p>
+        <div class="flex justify-between">
+          <button class="bg-blue-500 text-white px-4 py-2 rounded">Facebook</button>
+          <button class="bg-blue-400 text-white px-4 py-2 rounded">Twitter</button>
+          <button class="bg-green-500 text-white px-4 py-2 rounded">WhatsApp</button>
+        </div>
+        <button class="mt-4 text-gray-500" onclick="this.parentElement.remove()">Cancel</button>
+      `;
+      
+      document.body.appendChild(shareCard);
+      refreshIconsSoon();
+    }
+
+    // ================
+    // Theme handling
+    // ================
+    const themeSelect = document.getElementById('theme-select');
+    const storedTheme = localStorage.getItem('rpmTheme') || 'neon';
+    document.body.setAttribute('data-theme', storedTheme);
+    themeSelect.value = storedTheme;
+    function applyTheme(theme){ document.body.setAttribute('data-theme', theme); localStorage.setItem('rpmTheme', theme); }
+    themeSelect.addEventListener('change', (e)=> applyTheme(e.target.value));
+
+    // ================
+    // Language handling
+    // ================
+    const languageSelect = document.getElementById('language-select');
+    languageSelect.value = currentLanguage;
+    languageSelect.addEventListener('change', (e)=> setLanguage(e.target.value));
+
+    // ===================
+    // Render: Header
+    // ===================
+    function renderHeader(){
+      document.getElementById('header-user-name').textContent = appState.profile.name;
+      const hv = [ {k:'hr',i:'heart',l:t('home.vitals.hr'),v:appState.vitals.hr}, {k:'bp',i:'thermometer-half',l:t('home.vitals.bp'),v:appState.vitals.bp.replace('/', ' / ')}, {k:'bg',i:'droplet',l:t('home.vitals.bg'),v:appState.vitals.bg}, {k:'spo2',i:'wind',l:t('home.vitals.spo2'),v:appState.vitals.spo2} ];
+      const header = document.getElementById('header-vitals-display');
+      header.innerHTML = hv.map(v=>`<div class='flex items-center gap-1'><i data-lucide='${v.i}' class='w-4 h-4' style="color: var(--muted-2)"></i><span style="color: var(--muted-2)">${v.l}:</span><span class='font-bold' style="color: var(--fg)">${v.v}</span></div>`).join('');
+      
+      // Update gamification header
+      updateGamificationHeader();
+    }
+
+    // ===================
+    // Vitals Management
+    // ===================
+    function updateVital(key, value) {
+      appState.vitals[key] = value;
+      save();
+      renderHeader();
+      
+      // Add XP for updating vitals
+      const xpEarned = addXP(GAMIFICATION_CONFIG.xpPerVital, 'vital-update', document.querySelector(`[onchange*="${key}"]`));
+      
+      // Show confirmation
+      const status = document.getElementById('vitals-status');
+      if (status) {
+        status.textContent = `${t('common.save')}! +${xpEarned} XP`;
+        status.style.color = 'var(--ok)';
+        setTimeout(() => { status.textContent = ''; }, 2000);
+      }
+    }
+
+    function validateVital(key, value) {
+      switch(key) {
+        case 'hr':
+          const hr = parseInt(value);
+          return hr >= 40 && hr <= 200 ? hr : appState.vitals.hr;
+        case 'bg':
+          const bg = parseInt(value);
+          return bg >= 50 && bg <= 400 ? bg : appState.vitals.bg;
+        case 'spo2':
+          const spo2 = parseInt(value);
+          return spo2 >= 70 && spo2 <= 100 ? spo2 : appState.vitals.spo2;
+        case 'bp':
+          if (value.includes('/')) {
+            const [systolic, diastolic] = value.split('/').map(v => parseInt(v.trim()));
+            if (systolic >= 60 && systolic <= 200 && diastolic >= 40 && diastolic <= 130) {
+              return value;
+            }
+          }
+          return appState.vitals.bp;
+        default:
+          return value;
+      }
+    }
+
+    // ===================
+    // Render: Home page
+    // ===================
+    function renderHome(){
+      const score = calculateHealthScore();
+      const dosesTaken = appState.tasks.filter(t => t.icon === 'Pill' && t.isChecked).length;
+      const totalDoses = appState.tasks.filter(t => t.icon === 'Pill').length;
+      const nextPillTask = appState.tasks.find(t => t.icon === 'Pill' && !t.isChecked);
+      const nextDoseText = nextPillTask ? `${nextPillTask.name} at ${nextPillTask.timeLabel||toTimeLabel(nextPillTask.timeMM)}` : t('home.medication.next');
+
+      const home = document.getElementById('home-content');
+      home.innerHTML = `
+        <!-- Gamification Status Bar -->
+        <div class="card p-4 mb-6 cyber-border animate-slide-up">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="award" class="w-6 h-6" style="color: var(--accent-1)"></i>
+                <span class="font-bold">Level ${appState.gamification.level}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="flame" class="w-6 h-6" style="color: var(--accent-3)"></i>
+                <span class="font-bold">${appState.gamification.streak} Day Streak</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="star" class="w-6 h-6" style="color: var(--warn)"></i>
+                <span class="font-bold">${appState.gamification.xp}/${appState.gamification.xpToNextLevel} XP</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="coins" class="w-6 h-6" style="color: var(--warn)"></i>
+              <span class="font-bold">${appState.gamification.healthCoins}</span>
+            </div>
+          </div>
+          <div class="progress-rail mt-2">
+            <div class="progress-fill" style="width: ${(appState.gamification.xp / appState.gamification.xpToNextLevel) * 100}%"></div>
+          </div>
+        </div>
+
+        <div id="compliance-banner" class="card p-5 mb-6 cyber-border animate-bounce-in">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl" style="background: radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--accent-1) 35%, transparent), color-mix(in oklab, var(--accent-2) 25%, transparent));">
+                <i data-lucide="gauge-circle" class="w-6 h-6 text-white"></i>
+              </span>
+              <div>
+                <p class="text-xs font-semibold" style="color: var(--muted-2)">${t('home.compliance.title')}</p>
+                <p class="text-4xl font-extrabold tracking-tight drop-shadow" style="color: var(--fg)" id="compliance-score-display">${score}%</p>
+              </div>
+            </div>
+            <button class="glass-pill p-2" aria-label="Close banner" onclick="this.closest('#compliance-banner').remove()"><i data-lucide="x" class="w-5 h-5" style="color: var(--muted-2)"></i></button>
+          </div>
+          <div class="progress-rail mt-4"><div id="score-progress" class="progress-fill" style="width: ${Math.min(100,score)}%"></div></div>
+        </div>
+
+        <!-- Live Vitals Card -->
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <i data-lucide="activity" class="w-6 h-6" style="color: var(--accent-2)"></i>
+              <span class="lang-text" data-key="home.vitals.title">${t('home.vitals.title')}</span>
+            </h3>
+            <div class="text-xs font-semibold" id="vitals-status" style="color: var(--ok)"></div>
+          </div>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Heart Rate -->
+            <div class="text-center p-4 rounded-xl cyber-border animate-pulse-glow" style="background: color-mix(in oklab, var(--danger) 8%, transparent); border-color: color-mix(in oklab, var(--danger) 30%, transparent)">
+              <i data-lucide="heart" class="w-8 h-8 mx-auto mb-2" style="color: var(--danger)"></i>
+              <p class="text-sm font-semibold mb-1" style="color: var(--muted)">${t('home.vitals.hr')}</p>
+              <input type="number" 
+                     class="vital-input" 
+                     value="${appState.vitals.hr}" 
+                     onchange="updateVital('hr', validateVital('hr', this.value))"
+                     onblur="this.value = validateVital('hr', this.value)"
+                     min="40" max="200"
+                     aria-label="${t('home.vitals.hr')}">
+              <p class="text-xs mt-1" style="color: var(--muted-2)">${t('medical.bpm')}</p>
+            </div>
+
+            <!-- Blood Pressure -->
+            <div class="text-center p-4 rounded-xl cyber-border animate-pulse-glow" style="background: color-mix(in oklab, var(--warn) 8%, transparent); border-color: color-mix(in oklab, var(--warn) 30%, transparent)">
+              <i data-lucide="thermometer" class="w-8 h-8 mx-auto mb-2" style="color: var(--warn)"></i>
+              <p class="text-sm font-semibold mb-1" style="color: var(--muted)">${t('home.vitals.bp')}</p>
+              <input type="text" 
+                     class="vital-input" 
+                     value="${appState.vitals.bp}" 
+                     onchange="updateVital('bp', validateVital('bp', this.value))"
+                     onblur="this.value = validateVital('bp', this.value)"
+                     placeholder="120/80"
+                     pattern="\\d{2,3}/\\d{2,3}"
+                     aria-label="${t('home.vitals.bp')}">
+              <p class="text-xs mt-1" style="color: var(--muted-2)">${t('medical.mmhg')}</p>
+            </div>
+
+            <!-- Blood Glucose -->
+            <div class="text-center p-4 rounded-xl cyber-border animate-pulse-glow" style="background: color-mix(in oklab, var(--accent-1) 8%, transparent); border-color: color-mix(in oklab, var(--accent-1) 30%, transparent)">
+              <i data-lucide="droplet" class="w-8 h-8 mx-auto mb-2" style="color: var(--accent-1)"></i>
+              <p class="text-sm font-semibold mb-1" style="color: var(--muted)">${t('home.vitals.bg')}</p>
+              <input type="number" 
+                     class="vital-input" 
+                     value="${appState.vitals.bg}" 
+                     onchange="updateVital('bg', validateVital('bg', this.value))"
+                     onblur="this.value = validateVital('bg', this.value)"
+                     min="50" max="400"
+                     aria-label="${t('home.vitals.bg')}">
+              <p class="text-xs mt-1" style="color: var(--muted-2)">${t('medical.mgdl')}</p>
+            </div>
+
+            <!-- Oxygen Saturation -->
+            <div class="text-center p-4 rounded-xl cyber-border animate-pulse-glow" style="background: color-mix(in oklab, var(--ok) 8%, transparent); border-color: color-mix(in oklab, var(--ok) 30%, transparent)">
+              <i data-lucide="wind" class="w-8 h-8 mx-auto mb-2" style="color: var(--ok)"></i>
+              <p class="text-sm font-semibold mb-1" style="color: var(--muted)">${t('home.vitals.spo2')}</p>
+              <input type="number" 
+                     class="vital-input" 
+                     value="${appState.vitals.spo2}" 
+                     onchange="updateVital('spo2', validateVital('spo2', this.value))"
+                     onblur="this.value = validateVital('spo2', this.value)"
+                     min="70" max="100"
+                     aria-label="${t('home.vitals.spo2')}">
+              <p class="text-xs mt-1" style="color: var(--muted-2)">${t('medical.spo2')}</p>
+            </div>
+          </div>
+
+          <div class="mt-4 text-center">
+            <button onclick="triggerSmartAlert('doctor', 'Vitals update: HR ' + appState.vitals.hr + ', BP ' + appState.vitals.bp + ', BG ' + appState.vitals.bg + ', SpO2 ' + appState.vitals.spo2 + '%.')" 
+                    class="glass-pill px-4 py-2 text-sm font-semibold flex items-center gap-2 mx-auto hover:scale-105 transition-transform">
+              <i data-lucide="send" class="w-4 h-4"></i>
+              <span class="lang-text" data-key="home.vitals.share">${t('home.vitals.share')}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-around items-center mb-6 card p-4 cyber-border animate-zoom-in">
+          <button onclick="handleAlertHoldStart(event); setTimeout(() => handleAlertHoldEnd(event), 3000);" class="flex flex-col items-center nav-item hover:scale-110 active:scale-95 transition" type="button">
+            <span class="w-12 h-12 rounded-2xl grid place-items-center sos-alert cyber-border"><i data-lucide="siren" class="w-6 h-6 text-white"></i></span>
+            <span class="text-[11px] font-bold" style="color: #000000">SOS</span>
+          </button>
+          <button onclick="triggerSmartAlert('doctor', 'Secure daily report: Compliance score '+calculateHealthScore()+'%.');" class="flex flex-col items-center nav-item hover:scale-110 active:scale-95 transition" type="button">
+            <span class="w-12 h-12 rounded-2xl grid place-items-center cyber-border" style="background: color-mix(in oklab, var(--accent-2) 15%, transparent); border: 1px solid color-mix(in oklab, var(--accent-2) 40%, transparent)"><i data-lucide="phone-call" class="w-6 h-6" style="color: #000000"></i></span>
+            <span class="text-[11px] font-bold" style="color: #000000">Call Doctor</span>
+          </button>
+          <button onclick="changePage('gamification', document.querySelector('#bottom-nav button:last-child'))" class="flex flex-col items-center nav-item hover:scale-110 active:scale-95 transition" type="button">
+            <span class="w-12 h-12 rounded-2xl grid place-items-center cyber-border" style="background: color-mix(in oklab, var(--accent-1) 15%, transparent); border: 1px solid color-mix(in oklab, var(--accent-1) 40%, transparent)"><i data-lucide="gamepad-2" class="w-6 h-6" style="color: #000000"></i></span>
+            <span class="text-[11px] font-bold" style="color: #000000">Game</span>
+          </button>
+          <button onclick="changePage('todo', document.querySelector('#bottom-nav button:nth-child(2)'))" class="flex flex-col items-center nav-item hover:scale-110 active:scale-95 transition" type="button">
+            <span class="w-12 h-12 rounded-2xl grid place-items-center cyber-border" style="background: color-mix(in oklab, var(--ok) 12%, transparent); border: 1px solid color-mix(in oklab, var(--ok) 40%, transparent)"><i data-lucide="list-checks" class="w-6 h-6" style="color: #000000"></i></span>
+            <span class="text-[11px] font-bold" style="color: #000000">To‑Do List</span>
+          </button>
+        </div>
+
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-3 flex items-center gap-2"><i data-lucide="pill" class="w-6 h-6" style="color: #000000"></i><span class="lang-text" data-key="home.medication.title">${t('home.medication.title')}</span></h3>
+          <div class="flex items-center justify-between">
+            <div class="relative w-24 h-24">
+              <svg class="w-full h-full" viewBox="0 0 100 100" aria-hidden="true">
+                <circle style="color: var(--muted-2)" stroke-width="10" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"/>
+                <circle id="med-progress-ring" style="color: var(--accent-2)" class="transition-all duration-1000 ease-out" stroke-width="10" stroke-dasharray="251.2" stroke-dashoffset="${(1 - (totalDoses?dosesTaken/totalDoses:0)) * 251.2}" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" transform="rotate(-90 50 50)"/>
+                <text id="med-progress-text" x="50" y="55" font-size="20" text-anchor="middle" class="font-black" style="fill: var(--fg)">${totalDoses? Math.round(dosesTaken/totalDoses*100):0}%</text>
+              </svg>
+            </div>
+            <div class="text-right">
+              <p class="text-3xl font-extrabold drop-shadow" id="doses-taken-display" style="color: var(--ok)">${dosesTaken}/${totalDoses}</p>
+              <p class="text-xs" style="color: var(--muted-2)">${t('home.medication.doses')}</p>
+            </div>
+          </div>
+          <div class="mt-4 glass-pill px-4 py-2">
+            <p class="font-semibold text-sm flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4" style="color: var(--warn)"></i> <span style="color: var(--muted)">${t('home.medication.next')}:</span> <span id="next-med-display-home" class="ml-1 font-bold" style="color: var(--fg)">${nextDoseText}</span></p>
+          </div>
+        </div>
+
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="footprints" class="w-6 h-6"style="color: #000000"></i><span class="lang-text" data-key="home.activity.title">${t('home.activity.title')}</span></h3>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="flex flex-col items-center">
+              <div class="p-3 rounded-2xl border mb-2 animate-float cyber-border" style="background: color-mix(in oklab, var(--accent-2) 15%, transparent); border-color: color-mix(in oklab, var(--accent-2) 35%, transparent)"><i data-lucide="shoe" class="w-6 h-6" style="color: #000000"></i></div>
+              <p class="text-lg font-bold" style="color: var(--fg)">4,356</p>
+              <p class="text-xs" style="color: var(--muted-2)">${t('home.activity.steps')}</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="p-3 rounded-2xl border mb-2 animate-float cyber-border" style="animation-delay:.2s; background: color-mix(in oklab, var(--ok) 15%, transparent); border-color: color-mix(in oklab, var(--ok) 35%, transparent)"><i data-lucide="droplets" class="w-6 h-6" style="color: #005c99"></i></div>
+              <p class="text-lg font-bold" style="color: var(--fg)">6/8</p>
+              <p class="text-xs" style="color: var(--muted-2)">${t('home.activity.water')}</p>
+            </div>
+            <div class="flex flex-col items-center">
+              <div class="p-3 rounded-2xl border mb-2 animate-float cyber-border" style="animation-delay:.4s; background: color-mix(in oklab, var(--accent-1) 15%, transparent); border-color: color-mix(in oklab, var(--accent-1) 35%, transparent)"><i data-lucide="moon" class="w-6 h-6" style="color: #000000"></i></div>
+              <p class="text-lg font-bold" style="color: var(--fg)">7.2 hrs</p>
+              <p class="text-xs" style="color: var(--muted-2)">${t('home.activity.sleep')}</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="alerts-container" class="space-y-3 mb-8">
+          <div class="card p-4 flex items-center gap-3 cyber-border animate-shake" style="background: color-mix(in oklab, var(--danger) 8%, transparent); border-color: color-mix(in oklab, var(--danger) 40%, transparent)">
+            <i data-lucide="bell" class="w-6 h-6" style="color: var(--danger)"></i>
+            <p class="font-semibold" style="color: var(--fg)">${t('alerts.bp')}</p>
+          </div>
+          <div class="card p-4 flex items-center gap-3 cyber-border animate-shake" style="background: color-mix(in oklab, var(--warn) 8%, transparent); border-color: color-mix(in oklab, var(--warn) 40%, transparent)">
+            <i data-lucide="calendar-check" class="w-6 h-6" style="color: var(--warn)"></i>
+            <p class="font-semibold" style="color: var(--fg)">${t('alerts.doctor')}</p>
+          </div>
+        </div>
+      `;
+      refreshIconsSoon();
+    }
+
+    // ===================
+    // Render: To‑Do page
+    // ===================
+    function renderTodo(){
+      const remaining = appState.tasks.filter(t=>!t.isChecked).length;
+      const todo = document.getElementById('todo-content');
+      todo.innerHTML = `
+        <h2 class="text-3xl font-black mb-5 flex items-center justify-between tracking-tight animate-bounce-in" style="color: var(--fg)">
+          <span class="flex items-center gap-2"><i data-lucide=\"heart\" class=\"w-8 h-8\" style=\"color: var(--danger)\"></i><span class="neon-title lang-text" data-key="todo.title">${t('todo.title')}</span></span>
+          <span id="tasks-remaining-display" class="text-lg font-semibold" style="color: var(--muted)">${remaining} ${t('todo.remaining')}</span>
+        </h2>
+
+        <div class="card p-4 mb-6 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-3" style="color: var(--fg)">➕ <span class="lang-text" data-key="todo.add.title">${t('todo.add.title')}</span></h3>
+          <form id="add-task-form" class="space-y-3" novalidate>
+            <input type="text" id="new-task-title" placeholder="${t('todo.add.placeholder')}" class="w-full p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" required maxlength="120">
+            <div class="grid grid-cols-2 gap-3">
+              <input type="time" id="new-task-time" class="w-full p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" required>
+              <select id="new-task-type" class="w-full p-3 tile border bg-transparent focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" required>
+                <option value="Pill">Medication</option>
+                <option value="Footprints">Exercise</option>
+                <option value="Droplets">Hydration</option>
+                <option value="Activity">Vitals Check</option>
+                <option value="NotebookPen">Other</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-gradient w-full py-3 lang-text" data-key="todo.add.submit">${t('todo.add.submit')}</button>
+          </form>
+        </div>
+
+        <div id="task-list" class="space-y-4 mb-8" aria-live="polite"></div>
+
+        <div class="card p-4 mt-6 mb-8 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-3" style="color: var(--fg)">📅 <span class="lang-text" data-key="todo.preview.title">${t('todo.preview.title')}</span></h3>
+          <div id="tomorrow-preview" class="flex overflow-x-auto gap-4">
+            <div class="p-3 tile border min-w-40 text-center cyber-border">
+              <i data-lucide="clock" class="w-5 h-5 mx-auto" style="color: var(--muted-2)"></i>
+              <p class="text-sm font-semibold mt-1" style="color: var(--fg)">8:00 AM</p>
+              <p class="text-xs" style="color: var(--muted-2)">Morning BP Check</p>
+            </div>
+            <div class="p-3 tile border min-w-40 text-center cyber-border">
+              <i data-lucide="user-check" class="w-5 h-5 mx-auto" style="color: var(--accent-2)"></i>
+              <p class="text-sm font-semibold mt-1" style="color: var(--fg)">10:00 AM</p>
+              <p class="text-xs" style="color: var(--muted-2)">Doctor Visit Reminder</p>
+            </div>
+            <div class="p-3 tile border min-w-40 text-center cyber-border">
+              <i data-lucide="pill" class="w-5 h-5 mx-auto" style="color: var(--ok)"></i>
+              <p class="text-sm font-semibold mt-1" style="color: var(--fg)">1:00 PM</p>
+              <p class="text-xs" style="color: var(--muted-2)">Vitamin Dose Schedule</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Render tasks list
+      const list = todo.querySelector('#task-list');
+      const frag = document.createDocumentFragment();
+      const tasks = [...appState.tasks].sort((a,b)=> a.timeMM-b.timeMM || (a.isChecked - b.isChecked));
+      const nowMM = nowMinutes();
+      tasks.forEach(task=>{
+        const isDone = task.isChecked; 
+        let statusText = t('todo.status.upcoming');
+        if (isDone) statusText = t('todo.status.complete');
+        else if (task.timeMM < nowMM) statusText = t('todo.status.pending');
+        
+        const row = document.createElement('div'); 
+        row.className = `w-full p-3 rounded-xl flex items-center justify-between text-lg font-semibold transition shadow-lg cyber-border animate-slide-up ${isDone? '' : 'tile'}`; 
+        row.style.borderColor = 'var(--card-border)';
+        
+        const left = document.createElement('div'); 
+        left.className='flex items-center gap-3 flex-grow text-left'; 
+        left.onclick=()=>toggleTask(task.id);
+        
+        const iconWrap = document.createElement('span'); 
+        iconWrap.className='w-7 h-7 rounded-lg grid place-items-center'; 
+        iconWrap.style.background = isDone? 'color-mix(in oklab, var(--ok) 20%, transparent)': 'rgba(255,255,255,0.8)'; 
+        iconWrap.style.border = `1px solid ${isDone? 'color-mix(in oklab, var(--ok) 40%, transparent)' : 'var(--card-border)'}`;
+        
+        const star = document.createElement('i'); 
+        star.setAttribute('data-lucide','star'); 
+        star.className='w-4 h-4'; 
+        star.style.color = isDone? 'var(--ok)' : 'var(--muted-2)'; 
+        iconWrap.appendChild(star);
+        
+        const info = document.createElement('div'); 
+        info.className='flex flex-col';
+        
+        const title = document.createElement('span'); 
+        title.textContent = task.name; 
+        title.style.color = isDone? 'color-mix(in oklab, var(--ok) 85%, var(--fg) 10%)' : 'var(--fg)'; 
+        if(isDone) title.style.textDecoration='line-through';
+        
+        const sub = document.createElement('span'); 
+        sub.textContent = task.timeLabel || toTimeLabel(task.timeMM); 
+        sub.style.color='var(--muted-2)'; 
+        sub.className='text-xs';
+        
+        info.appendChild(title); 
+        info.appendChild(sub);
+        left.appendChild(iconWrap); 
+        left.appendChild(info);
+        
+        const right = document.createElement('div'); 
+        right.className='flex items-center gap-3';
+        
+        const statusIcon = document.createElement('i'); 
+        statusIcon.setAttribute('data-lucide', isDone? 'check-circle' : 'circle-x'); 
+        statusIcon.className = 'w-5 h-5'; 
+        statusIcon.style.color = isDone? 'var(--ok)' : (statusText===t('todo.status.pending')? 'var(--danger)' : 'var(--muted-2)');
+        
+        const statusLbl = document.createElement('span'); 
+        statusLbl.textContent = statusText; 
+        statusLbl.className = 'text-xs'; 
+        statusLbl.style.color = isDone? 'var(--ok)' : (statusText===t('todo.status.pending')? 'var(--danger)' : 'var(--muted-2)');
+        
+        // Add delete button
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'p-1 text-red-500 hover:bg-red-50 rounded transition-colors';
+        deleteBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteTask(task.id);
+        };
+        
+        right.appendChild(statusIcon); 
+        right.appendChild(statusLbl);
+        right.appendChild(deleteBtn);
+        row.appendChild(left); 
+        row.appendChild(right); 
+        frag.appendChild(row);
+      });
+      list.innerHTML=''; 
+      list.appendChild(frag);
+
+      // Add-task form handler
+      todo.querySelector('#add-task-form').onsubmit = (e)=>{
+        e.preventDefault();
+        const title = todo.querySelector('#new-task-title').value.trim();
+        const timeValue = todo.querySelector('#new-task-time').value;
+        const type = todo.querySelector('#new-task-type').value;
+        if(!title || !timeValue) return;
+        const [hh, mm] = timeValue.split(':').map(Number);
+        const newTask = { id: ++appState.taskIdCounter, name: title, icon: type, isChecked:false, timeMM: hh*60+mm, timeLabel: new Date(2000,0,1,hh,mm).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
+        appState.tasks.push(newTask); save(); renderTodo(); renderHome();
+      };
+
+      refreshIconsSoon();
+    }
+
+    // ===================
+    // Delete task function
+    // ===================
+    function deleteTask(id) {
+      if (confirm("Are you sure you want to delete this milestone?")) {
+        appState.tasks = appState.tasks.filter(t => t.id !== id);
+        save();
+        renderTodo();
+        renderHome();
+      }
+    }
+
+    // ===================
+    // Render: Progress page
+    // ===================
+    function renderProgress(){
+      const game = appState.gamification;
+      const progress = document.getElementById('progress-content');
+      progress.innerHTML = `
+        <h2 class="text-3xl font-black mb-5 text-center animate-bounce-in" style="color: var(--fg)"><i data-lucide="trophy" class="w-8 h-8" style="color: var(--warn)"></i> <span class="neon-title lang-text" data-key="progress.title">${t('progress.title')}</span></h2>
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <div class="flex items-center justify-center gap-4">
+            <i data-lucide="flame" class="w-10 h-10" style="color: var(--warn)"></i>
+            <div>
+              <p class="text-lg" style="color: var(--muted-2)">${t('progress.streak')}</p>
+              <p class="text-4xl font-extrabold drop-shadow" style="color: var(--fg)"><span id="streak-display">${game.streak}</span> ${t('progress.streak.days')}</p>
+            </div>
+          </div>
+        </div>
+        <div class="card p-6 mb-8 text-center cyber-border animate-slide-up">
+          <p class="text-lg font-semibold" style="color: var(--muted-2)">${t('progress.level')}</p>
+          <div class="text-6xl font-extrabold my-3 relative inline-block">
+            <span class="neon-title">Level <span id="level-display">${game.level}</span></span>
+            <i data-lucide="zap" class="w-8 h-8 absolute -top-1 -right-8 animate-float" style="color: var(--accent-3)"></i>
+          </div>
+          <div class="progress-rail"><div id="progress-bar" class="progress-fill" style="width: ${(game.xp / game.xpToNextLevel) * 100}%"></div></div>
+        </div>
+        
+        <!-- Risk Forecasting Section -->
+        <div class="card p-6 mb-8 cyber-border animate-slide-up">
+          <h3 class="text-2xl font-bold mb-4 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="activity" class="w-6 h-6" style="color: var(--accent-2)"></i><span class="lang-text" data-key="progress.risk.title">${t('progress.risk.title')}</span></h3>
+          <p class="text-sm mb-4" style="color: var(--muted-2)">Risk trend based on recent data:</p>
+          <div id="chart-container" class="flex justify-around items-end h-48 border-b pt-2" style="border-color: color-mix(in oklab, var(--accent-1) 20%, transparent)"></div>
+          <div id="chart-labels" class="flex justify-around text-sm font-medium mt-2" style="color: var(--muted-2)"></div>
+          <p id="predictive-insight" class="mt-4 glass-pill px-4 py-2"><span class="font-bold" style="color: var(--fg)">${t('common.insight')}:</span> <span style="color: var(--muted)">${t('progress.risk.insight')}</span></p>
+        </div>
+        
+        <div class="card p-6 mb-8 cyber-border animate-slide-up">
+          <h3 class="text-2xl font-bold mb-4 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="award" class="w-6 h-6" style="color: var(--accent-3)"></i><span class="neon-title lang-text" data-key="progress.badges">${t('progress.badges')}</span></h3>
+          <div id="badges-container" class="grid grid-cols-3 sm:grid-cols-5 gap-4"></div>
+        </div>
+      `;
+
+      // Render badges
+      const grid = progress.querySelector('#badges-container');
+      const userBadges = appState.gamification.badges;
+      
+      grid.innerHTML = Object.entries(GAMIFICATION_CONFIG.badges).map(([id, badge]) => {
+        const earned = userBadges.includes(id);
+        const tone = earned ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.7)';
+        const color = earned ? 'var(--ok)' : 'var(--muted-2)';
+        const textColor = earned ? 'var(--fg)' : 'var(--muted-2)';
+        
+        return `<div class="p-4 flex flex-col items-center rounded-xl cyber-border ${earned ? 'badge-unlocked' : ''}" style="background:${tone}; border:1px solid var(--card-border)">
+          <i data-lucide="${badge.icon}" class="w-8 h-8" style="color:${color}"></i>
+          <span class="text-xs font-semibold mt-1 text-center" style="color:${textColor}">${badge.name}</span>
+          <span class="text-xs mt-1 capitalize" style="color: var(--muted-2)">${badge.rarity}</span>
+        </div>`;
+      }).join('');
+
+      // Risk Forecasting chart
+      const chartContainer = progress.querySelector('#chart-container');
+      const chartLabels = progress.querySelector('#chart-labels');
+      chartContainer.innerHTML = ''; chartLabels.innerHTML = '';
+      appState.healthData.slice(-7).forEach(data => {
+        const riskHeight = Math.max(8, data.risk * 2);
+        const color = data.risk < 10 ? 'color-mix(in oklab, var(--ok) 35%, transparent)' : data.risk < 20 ? 'color-mix(in oklab, var(--warn) 35%, transparent)' : 'color-mix(in oklab, var(--danger) 35%, transparent)';
+        const bar = document.createElement('div'); bar.className = 'w-10 rounded-t-lg shadow-lg flex flex-col justify-end items-center text-white font-bold text-xs cyber-border';
+        bar.style.height = riskHeight + 'px'; bar.style.background = color; bar.style.border = '1px solid var(--card-border)';
+        const riskText = document.createElement('span'); riskText.textContent = `${data.risk}%`; riskText.className = 'p-1';
+        bar.appendChild(riskText); chartContainer.appendChild(bar);
+        const label = document.createElement('div'); label.className = 'w-10 text-center'; label.textContent = data.day; chartLabels.appendChild(label);
+      });
+
+      refreshIconsSoon();
+    }
+
+    // ===================
+    // Render: Gamification page
+    // ===================
+    function renderGamificationPage() {
+      const game = appState.gamification;
+      const gamification = document.getElementById('gamification-content');
+      gamification.innerHTML = `
+        <h2 class="text-3xl font-black mb-5 text-center animate-bounce-in" style="color: var(--fg)"><i data-lucide="gamepad-2" class="w-8 h-8" style="color: var(--accent-1)"></i> <span class="neon-title lang-text" data-key="gamification.title">${t('gamification.title')}</span></h2>
+        
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div class="card p-4 text-center cyber-border animate-slide-up">
+            <i data-lucide="award" class="w-8 h-8 mx-auto mb-2" style="color: var(--accent-1)"></i>
+            <p class="text-2xl font-bold" style="color: var(--fg)">${game.level}</p>
+            <p class="text-sm" style="color: var(--muted-2)">${t('gamification.level')}</p>
+          </div>
+          <div class="card p-4 text-center cyber-border animate-slide-up">
+            <i data-lucide="star" class="w-8 h-8 mx-auto mb-2" style="color: var(--warn)"></i>
+            <p class="text-2xl font-bold" style="color: var(--fg)">${game.xp}</p>
+            <p class="text-sm" style="color: var(--muted-2)">${t('gamification.xp')}</p>
+          </div>
+          <div class="card p-4 text-center cyber-border animate-slide-up ${game.streak >= 7 ? 'streak-fire' : ''}">
+            <i data-lucide="flame" class="w-8 h-8 mx-auto mb-2" style="color: var(--accent-3)"></i>
+            <p class="text-2xl font-bold" style="color: var(--fg)">${game.streak}</p>
+            <p class="text-sm" style="color: var(--muted-2)">${t('gamification.streak')}</p>
+          </div>
+          <div class="card p-4 text-center cyber-border animate-slide-up ${game.combo >= 3 ? 'animate-combo-pulse' : ''}">
+            <i data-lucide="zap" class="w-8 h-8 mx-auto mb-2" style="color: var(--accent-2)"></i>
+            <p class="text-2xl font-bold" style="color: var(--fg)">${game.combo}</p>
+            <p class="text-sm" style="color: var(--muted-2)">${t('gamification.combo')}</p>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <div class="flex justify-between mb-2">
+            <span class="font-semibold" style="color: var(--fg)">Level Progress</span>
+            <span class="font-semibold" style="color: var(--muted)">${game.xp}/${game.xpToNextLevel} XP</span>
+          </div>
+          <div class="progress-rail">
+            <div class="progress-fill" style="width: ${(game.xp / game.xpToNextLevel) * 100}%"></div>
+          </div>
+          <div class="flex justify-between mt-2 text-sm" style="color: var(--muted-2)">
+            <span>Level ${game.level}</span>
+            <span>Level ${game.level + 1}</span>
+          </div>
+        </div>
+        
+        <!-- Mystery Box -->
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="package" class="w-6 h-6" style="color: var(--accent-1)"></i><span class="lang-text" data-key="gamification.mysteryBox">${t('gamification.mysteryBox')}</span></h3>
+          <div class="mystery-box text-center" onclick="openMysteryBox()">
+            <i data-lucide="package" class="w-16 h-16 mx-auto mb-4" style="color: white"></i>
+            <h4 class="text-xl font-bold text-white mb-2">Mystery Box</h4>
+            <p class="text-white mb-4">Unlock for 10 Health Coins</p>
+            <div class="flex justify-center items-center gap-2">
+              <i data-lucide="coins" class="w-5 h-5" style="color: gold"></i>
+              <span class="text-white font-bold">${game.healthCoins}/10</span>
+            </div>
+          </div>
+          <p class="text-center mt-4 text-sm" style="color: var(--muted-2)">Boxes opened: ${game.mysteryBoxesOpened}</p>
+        </div>
+        
+        <!-- Badges Collection -->
+        <div class="card p-6 mb-6 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="award" class="w-6 h-6" style="color: var(--accent-3)"></i><span class="lang-text" data-key="gamification.badges">${t('gamification.badges')}</span></h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            ${Object.entries(GAMIFICATION_CONFIG.badges).map(([id, badge]) => {
+              const earned = appState.gamification.badges.includes(id);
+              return `
+                <div class="p-4 flex flex-col items-center rounded-xl cyber-border ${earned ? 'badge-unlocked' : 'opacity-70'}" style="border:1px solid var(--card-border)">
+                  <i data-lucide="${badge.icon}" class="w-8 h-8 mb-2" style="color: ${earned ? 'var(--ok)' : 'var(--muted-2)'}"></i>
+                  <span class="text-xs font-semibold text-center" style="color: var(--fg)">${badge.name}</span>
+                  <span class="text-xs mt-1 capitalize" style="color: var(--muted-2)">${badge.rarity}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        
+        <!-- Share Achievement -->
+        <div class="card p-6 mb-8 cyber-border animate-slide-up">
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="share-2" class="w-6 h-6" style="color: var(--ok)"></i><span class="lang-text" data-key="gamification.share">${t('gamification.share')}</span></h3>
+          <p class="mb-4" style="color: var(--muted-2)">Share your health journey achievements with friends and family!</p>
+          <button onclick="shareAchievement('level', ${game.level})" class="btn-gradient w-full py-3 flex items-center justify-center gap-2">
+            <i data-lucide="share-2" class="w-5 h-5"></i>
+            <span>Share My Progress</span>
+          </button>
+        </div>
+      `;
+      
+      refreshIconsSoon();
+    }
+
+    // ===================
+    // Medication Management Functions
+    // ===================
+    function addMedication() {
+      const newMedInput = document.getElementById('new-medication');
+      const medication = newMedInput.value.trim();
+      
+      if (medication) {
+        if (!appState.profile.medications) {
+          appState.profile.medications = [];
+        }
+        appState.profile.medications.push(medication);
+        newMedInput.value = '';
+        save();
+        renderSettings(); // Re-render to show updated list
+      }
+    }
+
+    function updateMedication(index, value) {
+      if (appState.profile.medications && appState.profile.medications[index]) {
+        appState.profile.medications[index] = value.trim();
+        save();
+      }
+    }
+
+    function removeMedication(index) {
+      if (appState.profile.medications && appState.profile.medications[index]) {
+        appState.profile.medications.splice(index, 1);
+        save();
+        renderSettings(); // Re-render to show updated list
+      }
+    }
+
+    // ===================
+    // Render: Settings page
+    // ===================
+    function renderSettings(){
+      const s = document.getElementById('settings-content');
+      s.innerHTML = `
+        <h2 class="text-3xl font-black mb-5" style="color: var(--fg)"><i data-lucide="settings" class="w-8 h-8" style="color: var(--accent-1)"></i> <span class="neon-title lang-text" data-key="settings.title">${t('settings.title')}</span></h2>
+        <div class="space-y-6">
+          <!-- Enhanced Profile Section with Medications -->
+          <div class="card p-6 cyber-border animate-slide-up">
+            <h3 class="text-2xl font-bold mb-3 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="user" class="w-6 h-6" style="color: var(--accent-2)"></i><span class="lang-text" data-key="settings.profile.title">${t('settings.profile.title')}</span></h3>
+            <form id="profile-form" class="space-y-4" novalidate>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block font-medium mb-2 lang-text" data-key="settings.profile.name" style="color: var(--muted)">${t('settings.profile.name')}</label>
+                  <input type="text" id="profile-name" class="w-full p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" required>
+                </div>
+                <div>
+                  <label class="block font-medium mb-2 lang-text" data-key="settings.profile.dob" style="color: var(--muted)">${t('settings.profile.dob')}</label>
+                  <input type="date" id="profile-dob" class="w-full p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" required>
+                </div>
+              </div>
+              <div>
+                <label class="block font-medium mb-2 lang-text" data-key="settings.profile.conditions" style="color: var(--muted)">${t('settings.profile.conditions')}</label>
+                <textarea id="profile-conditions" rows="3" class="w-full p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" placeholder="${t('settings.profile.conditions')}"></textarea>
+              </div>
+              
+              <!-- Medications Section -->
+              <div>
+                <label class="block font-medium mb-2 lang-text" data-key="settings.profile.medications" style="color: var(--muted)">${t('settings.profile.medications')}</label>
+                <div id="medications-list" class="space-y-2 mb-3">
+                  ${appState.profile.medications ? appState.profile.medications.map((med, index) => `
+                    <div class="flex items-center gap-2 p-2 tile border cyber-border">
+                      <input type="text" value="${med}" class="flex-1 p-2 bg-transparent border-none focus:outline-none" onchange="updateMedication(${index}, this.value)" placeholder="Medication name and dosage">
+                      <button type="button" onclick="removeMedication(${index})" class="p-1 text-red-500 hover:bg-red-50 rounded">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    </div>
+                  `).join('') : ''}
+                </div>
+                <div class="flex gap-2">
+                  <input type="text" id="new-medication" class="flex-1 p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" placeholder="Add new medication (e.g., Aspirin 75mg)">
+                  <button type="button" onclick="addMedication()" class="btn-gradient px-4 py-3 flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label class="block font-medium mb-2 lang-text" data-key="settings.profile.emergency" style="color: var(--muted)">${t('settings.profile.emergency')}</label>
+                <input type="text" id="profile-emergency-contact" class="w-full p-3 tile border focus:outline-none focus:ring-2 focus:ring-opacity-30" style="focus-ring-color: var(--accent-1)" placeholder="${t('settings.profile.emergency')}">
+              </div>
+              <button type="submit" class="btn-gradient w-full py-3 lang-text" data-key="common.save">${t('common.save')}</button>
+            </form>
+          </div>
+
+          <div class="card p-6 cyber-border animate-slide-up">
+            <h3 class="text-2xl font-bold mb-3 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="users" class="w-6 h-6" style="color: var(--ok)"></i><span class="lang-text" data-key="settings.connections.title">${t('settings.connections.title')}</span></h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-3 tile border cyber-border">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="user-check" class="w-6 h-6" style="color: var(--ok)"></i>
+                  <div>
+                    <p class="font-semibold" style="color: var(--fg)">Dr. Sarah Johnson</p>
+                    <p class="text-xs" style="color: var(--muted-2)">Primary Care Physician</p>
+                  </div>
+                </div>
+                <button class="btn-gradient px-4 py-2 lang-text" data-key="common.edit" type="button">${t('common.edit')}</button>
+              </div>
+              <div class="flex items-center justify-between p-3 tile border cyber-border">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="users-2" class="w-6 h-6" style="color: var(--warn)"></i>
+                  <div>
+                    <p class="font-semibold" style="color: var(--fg)">Family Members</p>
+                    <p class="text-xs" style="color: var(--muted-2)">3 connected family members</p>
+                  </div>
+                </div>
+                <button class="btn-gradient px-4 py-2 lang-text" data-key="common.edit" type="button">${t('common.edit')}</button>
+              </div>
+              <div class="flex items-center justify-between p-3 tile border cyber-border">
+                <div class="flex items-center gap-3">
+                  <i data-lucide="activity" class="w-6 h-6" style="color: var(--accent-3)"></i>
+                  <div>
+                    <p class="font-semibold" style="color: var(--fg)">Health Devices</p>
+                    <p class="text-xs" style="color: var(--muted-2)">2 connected devices</p>
+                  </div>
+                </div>
+                <button class="btn-gradient px-4 py-2 lang-text" data-key="common.edit" type="button">${t('common.edit')}</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-6 cyber-border animate-slide-up">
+            <h3 class="text-2xl font-bold mb-3 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="database" class="w-6 h-6" style="color: var(--accent-2)"></i><span class="lang-text" data-key="settings.export.title">${t('settings.export.title')}</span></h3>
+            <p class="text-sm mb-4" style="color: var(--muted-2)">${t('settings.export.description')}</p>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 tile border cyber-border">
+                <div>
+                  <p class="font-semibold lang-text" data-key="settings.export.health" style="color: var(--fg)">${t('settings.export.health')}</p>
+                  <p class="text-xs" style="color: var(--muted-2)">Vitals, medications, and compliance data</p>
+                </div>
+                <button id="export-abdm-btn" class="btn-gradient px-4 py-2 flex items-center gap-2" type="button"><i data-lucide="download" class="w-4 h-4"></i><span class="lang-text" data-key="common.export">Export CSV</span></button>
+                <button id="export-abdm-btn" class="btn-gradient px-4 py-2 flex items-center gap-2" type="button"><i data-lucide="send" class="w-4 h-4"></i><span class="lang-text" data-key="common.export">Share</span></button>
+
+              </div>
+              <div class="flex items-center justify-between p-4 tile border cyber-border">
+                <div>
+                  <p class="font-semibold lang-text" data-key="settings.export.meds" style="color: var(--fg)">${t('settings.export.meds')}</p>
+                  <p class="text-xs" style="color: var(--muted-2)">Complete medication adherence records</p>
+                </div>
+                <button id="export-meds-btn" class="btn-gradient px-4 py-2 flex items-center gap-2" type="button"><i data-lucide="download" class="w-4 h-4"></i><span class="lang-text" data-key="common.export">Export CSV</span></button>
+                <button id="export-abdm-btn" class="btn-gradient px-4 py-2 flex items-center gap-2" type="button"><i data-lucide="send" class="w-4 h-4"></i><span class="lang-text" data-key="common.export">Share</span></button>
+
+              </div>
+            </div>
+            <div id="export-status" class="mt-4 text-center font-semibold text-lg" style="color: var(--fg)"></div>
+          </div>
+
+          <div class="card p-6 mb-8 cyber-border animate-slide-up">
+            <h3 class="text-2xl font-bold mb-3 flex items-center gap-2" style="color: var(--fg)"><i data-lucide="send" class="w-6 h-6" style="color: var(--ok)"></i><span class="lang-text" data-key="settings.share.title">${t('settings.share.title')}</span></h3>
+            <p class="text-lg mb-4" style="color: var(--muted-2)">${t('settings.share.description')}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button id="alert-family-btn" class="btn-gradient py-3 flex items-center justify-center gap-2" type="button"><i data-lucide="users" class="w-6 h-6"></i><span class="lang-text" data-key="settings.share.family">${t('settings.share.family')}</span></button>
+              <button id="alert-doctor-btn" class="btn-gradient py-3 flex items-center justify-center gap-2" type="button"><i data-lucide="user-check" class="w-6 h-6"></i><span class="lang-text" data-key="settings.share.doctor">${t('settings.share.doctor')}</span></button>
+            </div>
+            <p id="alert-status" class="mt-4 text-center font-semibold text-xl" style="color: var(--fg)"></p>
+          </div>
+        </div>
+      `;
+
+      // Populate profile form values
+      s.querySelector('#profile-name').value = appState.profile.name || '';
+      s.querySelector('#profile-dob').value = appState.profile.dob || '';
+      s.querySelector('#profile-conditions').value = appState.profile.conditions || '';
+      s.querySelector('#profile-emergency-contact').value = appState.profile.emergencyContact || '';
+
+      // Profile save
+      s.querySelector('#profile-form').onsubmit = (e)=>{
+        e.preventDefault();
+        appState.profile = {
+          name: s.querySelector('#profile-name').value,
+          dob: s.querySelector('#profile-dob').value,
+          conditions: s.querySelector('#profile-conditions').value,
+          emergencyContact: s.querySelector('#profile-emergency-contact').value,
+          medications: appState.profile.medications || []
+        };
+        save(); 
+        renderHeader();
+        const btn = s.querySelector('#profile-form button'); 
+        const original = btn.textContent; 
+        btn.textContent = t('common.save') + '!';
+        btn.classList.add('animate-pulse'); 
+        setTimeout(()=>{ 
+          btn.textContent = original; 
+          btn.classList.remove('animate-pulse'); 
+        }, 1200);
+      };
+
+      // Export health data
+      const exportStatus = s.querySelector('#export-status');
+      s.querySelector('#export-abdm-btn').onclick = ()=>{
+        exportStatus.textContent = 'Preparing health data export…';
+        // Build csv
+        const headers = 'Date,Heart Rate,Blood Pressure,Blood Glucose,SpO2,Compliance Score\n';
+        const rows = appState.healthData.map(d => `${d.day},${appState.vitals.hr},${appState.vitals.bp},${appState.vitals.bg},${appState.vitals.spo2},${d.score}`).join('\n');
+        const csv = headers + rows;
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `health_data_${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url);
+        exportStatus.textContent = 'Health data exported successfully!'; setTimeout(()=> exportStatus.textContent = '', 2500);
+      };
+      s.querySelector('#export-meds-btn').onclick = ()=>{
+        exportStatus.textContent = 'Preparing medication data export…';
+        const headers = 'Date,Medication,Status\n';
+        const rows = appState.medicationHistory.flatMap(day => day.meds.map(med => `${day.date},${med},Taken`)).join('\n');
+        const csv = headers + rows;
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `medication_data_${new Date().toISOString().split('T')[0]}.csv`; a.click(); URL.revokeObjectURL(url);
+        exportStatus.textContent = 'Medication data exported successfully!'; setTimeout(()=> exportStatus.textContent = '', 2500);
+      };
+
+      // Share buttons
+      s.querySelector('#alert-family-btn').onclick = ()=> triggerSmartAlert('family', `Patient health compliance is at ${calculateHealthScore()}%. Just checking in.`);
+      s.querySelector('#alert-doctor-btn').onclick = ()=> triggerSmartAlert('doctor', `Secure daily report: Compliance ${calculateHealthScore()}%. Vitals: HR ${appState.vitals.hr}, BP ${appState.vitals.bp}.`);
+
+      refreshIconsSoon();
+    }
+
+    // ===================
+    // Global actions: Tasks & Alerts
+    // ===================
+    window.toggleTask = (id) => {
+      const t = appState.tasks.find(x=>x.id===id); 
+      if(!t) return; 
+      
+      t.isChecked = !t.isChecked; 
+      
+      // Update streak
+      updateStreak();
+      
+      // Add XP for task completion
+      if (t.isChecked) {
+        let xpAmount = GAMIFICATION_CONFIG.xpPerTask;
+        
+        // Bonus XP for medication tasks
+        if (t.icon === 'Pill') {
+          xpAmount = GAMIFICATION_CONFIG.xpPerMedication;
+        }
+        
+        const xpEarned = addXP(xpAmount, 'task-complete', document.querySelector(`[onclick*="${id}"]`));
+        
+        // Play sound
+        SOUNDS.taskComplete.play();
+        
+        // Check for task-related badges
+        if (appState.tasks.filter(task => task.isChecked).length >= 10) {
+          checkBadgeUnlock('task-master');
+        }
+        
+        // Show confetti for completed tasks
+        confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
+      }
+      
+      save(); 
+      renderTodo(); 
+      renderHome();
+      renderProgress();
+    };
+
+    // SOS & Alerts
+    let alertTimeout=null, countdownInterval=null; const ALERT_HOLD_DURATION=3000;
+    const countdownDisplay = document.getElementById('countdown-display');
+    const sirenIcon = document.getElementById('siren-icon');
+    window.handleAlertHoldStart = (e) => {
+      e.preventDefault(); if (alertTimeout) clearTimeout(alertTimeout); if (countdownInterval) clearInterval(countdownInterval);
+      countdownDisplay.textContent='3'; countdownDisplay.classList.remove('opacity-0'); sirenIcon.classList.add('opacity-0');
+      let count=3; countdownInterval=setInterval(()=>{ count--; countdownDisplay.textContent = count>0? String(count) : ''; if(count<=0) clearInterval(countdownInterval); },1000);
+      alertTimeout = setTimeout(()=>{ 
+        countdownDisplay.classList.add('opacity-0'); 
+        sirenIcon.classList.remove('opacity-0'); 
+        triggerSmartAlert('doctor', `EMERGENCY ALERT: Patient activated SOS hold. Vitals: HR ${appState.vitals.hr}, BP ${appState.vitals.bp}.`);
+        showSOSSentMessage();
+      }, ALERT_HOLD_DURATION);
+    };
+    window.handleAlertHoldEnd = (e) => { e.preventDefault(); if(alertTimeout){clearTimeout(alertTimeout); alertTimeout=null;} if(countdownInterval){clearInterval(countdownInterval); countdownInterval=null;} countdownDisplay.classList.add('opacity-0'); sirenIcon.classList.remove('opacity-0'); };
+    window.handleAlertHoldMove = () => {};
+    
+    function showSOSSentMessage() {
+      const message = document.createElement('div');
+      message.className = 'sos-sent-message';
+      message.textContent = t('sos.sent');
+      document.body.appendChild(message);
+      
+      setTimeout(() => {
+        document.body.removeChild(message);
+      }, 3000);
+    }
+    
+    window.triggerSmartAlert = (to, msg) => {
+      const status = document.getElementById('alert-status');
+      if (status) { status.textContent = `Sending to ${to==='family'?'Family':'Healthcare Provider'}...`; setTimeout(()=>{ status.textContent='Alert sent!'; setTimeout(()=>status.textContent='',2200); }, 1000); }
+      console.log(`[Smart Alert] ${to}: ${msg}`);
+    };
+
+    // ===================
+    // Page switching
+    // ===================
+    function changePage(p, btn){
+      document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+      document.querySelector(`#page-${p}`).classList.add('active');
+      
+      // Only update bottom nav if a button was clicked
+      if (btn) {
+        document.querySelectorAll('#bottom-nav .nav-item').forEach(el=>{
+          el.classList.remove('active'); 
+          el.removeAttribute('aria-current');
+        });
+        btn.classList.add('active'); 
+        btn.setAttribute('aria-current','page');
+      }
+      
+      appState.currentPage = p; 
+      save();
+
+      // Render per-page content on navigation
+      if (p==='home') renderHome();
+      if (p==='todo') renderTodo();
+      if (p==='progress') renderProgress();
+      if (p==='gamification') renderGamificationPage();
+      if (p==='settings') renderSettings();
+      refreshIconsSoon();
+    }
+    window.changePage = changePage;
+
+    function renderAllPages() {
+      renderHeader();
+      if (appState.currentPage === 'home') renderHome();
+      if (appState.currentPage === 'todo') renderTodo();
+      if (appState.currentPage === 'progress') renderProgress();
+      if (appState.currentPage === 'gamification') renderGamificationPage();
+      if (appState.currentPage === 'settings') renderSettings();
+    }
+
+    // ===================
+    // Mobile menu functionality
+    // ===================
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+      const floatingHeader = document.getElementById('floating-header');
+      
+      if (mobileMenuBtn && floatingHeader) {
+        mobileMenuBtn.addEventListener('click', () => {
+          floatingHeader.classList.toggle('mobile-menu-open');
+          // Toggle menu icon
+          const icon = mobileMenuBtn.querySelector('i');
+          if (floatingHeader.classList.contains('mobile-menu-open')) {
+            icon.setAttribute('data-lucide', 'x');
+          } else {
+            icon.setAttribute('data-lucide', 'menu');
+          }
+          refreshIconsSoon();
+        });
+      }
+      
+      setLanguage(currentLanguage);
+      renderAllPages();
+      refreshIconsSoon();
+      
+      // Initialize streak on app load
+      updateStreak();
+    });
+  </script>
+</body>
+</html>
