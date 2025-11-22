@@ -139,7 +139,7 @@
   </script>
 
   <style>
-    /* LIGHT THEME TOKENS with reduced intensity */
+    
     :root {
       --bg: #FAFBFF;
       --bg-elev: rgba(255,255,255,0.98);
@@ -291,7 +291,7 @@
     .page.active{ display:block; animation: fadeIn .3s ease; }
     @keyframes fadeIn{ from{ opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
 
-    /* Enhanced cyberpunk elements */
+    
     .cyber-border {
       position: relative;
     }
@@ -306,7 +306,7 @@
       filter: blur(8px);
     }
 
-    /* Floating header styles */
+    
     .floating-header {
       margin: 0 auto 2rem auto;
       border-radius: 1.5rem;
@@ -323,13 +323,13 @@
       transform: translateY(-2px);
     }
 
-    /* Ensure content has enough space at the bottom */
+    
     .main-content {
       min-height: calc(100vh - 200px);
       padding-bottom: 2rem;
     }
 
-    /* Vitals input styles */
+    
     .vital-input {
       background: transparent;
       border: none;
@@ -351,7 +351,7 @@
       background: color-mix(in oklab, var(--accent-1) 5%, transparent);
     }
 
-    /* Language specific styles */
+   
     .hindi { font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', sans-serif; }
     .bengali { font-family: 'Noto Sans Bengali', 'SolaimanLipi', 'Arial Unicode MS', sans-serif; }
     .telugu { font-family: 'Noto Sans Telugu', 'Gautami', 'Arial Unicode MS', sans-serif; }
@@ -367,7 +367,7 @@
       transition: all 0.3s ease;
     }
 
-    /* SOS Alert Styles */
+   
     .sos-alert {
       background: radial-gradient(120px 120px at 50% 40%, color-mix(in oklab, var(--danger) 60%, transparent), color-mix(in oklab, var(--danger) 25%, transparent));
       color: white;
@@ -402,7 +402,7 @@
       100% { opacity: 0; }
     }
 
-    /* Gamification Styles */
+    
     .level-up-animation {
       position: fixed;
       top: 0;
@@ -564,7 +564,7 @@
       margin-bottom: 1rem;
     }
 
-    /* Responsive header styles */
+   
     .header-top {
       display: flex;
       flex-wrap: wrap;
@@ -630,7 +630,7 @@
       }
     }
 
-    /* Mobile menu button */
+    
     .mobile-menu-btn {
       display: none;
       background: transparent;
@@ -670,7 +670,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Bengali:wght@400;500;700&family=Noto+Sans+Telugu:wght@400;500;700&family=Noto+Sans+Tamil:wght@400;500;700&family=Noto+Sans+Gujarati:wght@400;500;700&family=Noto+Sans+Gurmukhi:wght@400;500;700&family=Noto+Sans+Kannada:wght@400;500;700&family=Noto+Sans+Malayalam:wght@400;500;700&family=Noto+Sans+Oriya:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body data-theme="neon">
-  <!-- Level Up Animation Container -->
+  
   <div id="level-up-animation" class="level-up-animation" style="display: none;">
     <div class="level-up-content">
       <h2 class="text-4xl font-bold mb-4">LEVEL UP!</h2>
@@ -682,15 +682,15 @@
     </div>
   </div>
 
-  <!-- Combo Indicator -->
+ 
   <div id="combo-indicator" class="combo-indicator" style="display: none;">
     COMBO x<span id="combo-count">1</span>
   </div>
 
-  <!-- XP Bubbles Container -->
+ 
   <div id="xp-bubbles-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;"></div>
 
-  <!-- Header - Responsive version -->
+  
   <header id="floating-header" class="max-w-5xl mx-auto floating-header" style="border-color: color-mix(in oklab, var(--accent-1) 20%, transparent)">
     <div class="header-top">
       <div class="header-user-info">
@@ -703,12 +703,10 @@
         </div>
       </div>
 
-      <!-- Mobile menu button -->
       <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Toggle menu">
         <i data-lucide="menu" class="w-6 h-6" style="color: var(--accent-1)"></i>
       </button>
 
-      <!-- Gamification Stats with Settings - Desktop -->
       <div class="header-stats">
         <div class="flex items-center gap-2 glass-pill px-3 py-1">
           <i data-lucide="flame" class="w-4 h-4" style="color: var(--accent-3)"></i>
@@ -723,14 +721,12 @@
           <span class="text-sm font-bold" id="header-xp">150/200</span>
         </div>
         
-        <!-- Settings Icon in Header -->
         <button onclick="changePage('settings', null)" class="flex items-center gap-2 glass-pill px-3 py-2 hover:scale-105 transition-transform" type="button" aria-label="Settings">
           <i data-lucide="settings" class="w-4 h-4" style="color: var(--accent-1)"></i>
           <span class="text-sm font-semibold lang-text" data-key="nav.settings" style="color: #000000">Settings</span>
         </button>
       </div>
 
-      <!-- LANGUAGE & THEME SWITCHER -->
       <div class="header-controls">
         <div class="flex items-center gap-2">
           <label for="language-select" class="text-xs" style="color: var(--muted-2)">Language</label>
@@ -789,7 +785,6 @@
     </section>
   </main>
 
-  <!-- Bottom Nav (Settings removed from here) -->
   <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 h-20 flex justify-around items-center border-t" style="background: linear-gradient(180deg, rgba(250,251,255,0.98), rgba(248,250,255,0.95)); backdrop-filter: blur(12px); border-color: color-mix(in oklab, var(--accent-1) 20%, transparent)" role="navigation" aria-label="Primary">
     <button onclick="changePage('home', this)" class="nav-item flex flex-col items-center justify-center active" aria-current="page" type="button">
       <i data-lucide="home" class="w-7 h-7" style="color: var(--accent-1)"></i>
@@ -818,9 +813,9 @@
   </nav>
 
   <script>
-    // ===================
+   
     // State & Utilities
-    // ===================
+    
     const TODAY_DATE_KEY = new Date().toDateString();
     const toTimeLabel = (m) => { const h=Math.floor(m/60), mm=m%60; const d=new Date(2000,0,1,h,mm); return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); };
     const nowMinutes = () => { const d = new Date(); return d.getHours()*60 + d.getMinutes(); };
@@ -831,9 +826,9 @@
       contrast: { bg:'#FFFFFF', fg:'#000000', muted:'#000000', muted2:'#111827', primary:'#0066FF', secondary:'#00D4AA', accent:'#FF6B00', ok:'#059669', warn:'#D97706', danger:'#DC2626' }
     };
 
-    // ===================
+   
     // Gamification Engine
-    // ===================
+    
     const GAMIFICATION_CONFIG = {
       // XP system
       xpPerTask: 10,
@@ -845,7 +840,7 @@
       levelThresholds: [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5000],
       
       // Combo system
-      comboTimeWindow: 5000, // 5 seconds
+      comboTimeWindow: 5000, 
       comboMultipliers: {
         2: 1.2,
         3: 1.5,
@@ -897,9 +892,9 @@
       streak: new Howl({ src: ['https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'] })
     };
 
-    // ===================
+    
     // Multi-language Support
-    // ===================
+    
     const translations = {
       en: {
         // Navigation
@@ -1140,10 +1135,10 @@
     }
 
     function applyLanguage() {
-      // Update HTML lang attribute
+     
       document.documentElement.lang = currentLanguage;
       
-      // Apply language-specific font class
+     
       Object.values(languageClasses).forEach(cls => {
         document.body.classList.remove(cls);
       });
@@ -1151,7 +1146,7 @@
         document.body.classList.add(languageClasses[currentLanguage]);
       }
       
-      // Update all elements with data-key attribute
+     
       document.querySelectorAll('[data-key]').forEach(element => {
         const key = element.getAttribute('data-key');
         if (translations[currentLanguage] && translations[currentLanguage][key]) {
@@ -1160,7 +1155,7 @@
         }
       });
       
-      // Update greeting
+     
       updateGreeting();
     }
 
@@ -1177,7 +1172,7 @@
       document.getElementById('greeting-text').textContent = t(greetingKey);
     }
 
-    // Enhanced initial state with gamification and medications
+    
     const INITIAL_STATE = {
       profile: { 
         name: 'Rohan Choure', 
@@ -1198,7 +1193,7 @@
         { date: 'Mon', meds: ['Aspirin (AM)', 'Metformin (AM)'], nextDose: 'Aspirin at 8:00 PM', dosesTaken: 2, totalDoses: 3 },
         { date: 'Sun', meds: ['Aspirin (AM)', 'Metformin (AM)', 'Aspirin (PM)'], nextDose: 'Aspirin (AM)', dosesTaken: 3, totalDoses: 3 },
       ],
-      // Enhanced gamification state
+
       gamification: { 
         level: 5,
         xp: 150,
@@ -1233,38 +1228,33 @@
     const refreshIconsSoon = () => { if (typeof lucide==='undefined') return; requestAnimationFrame(()=>lucide.createIcons({attrs:{'stroke-width':2,'class':'lucide'}})); };
     const calculateHealthScore = () => { const c=appState.tasks.filter(t=>t.isChecked).length; const total=appState.tasks.length; return total?Math.round((c/total)*100):0; };
 
-    // ===================
-    // Gamification Engine Functions
-    // ===================
     
-    // Add XP with visual feedback
+    // Gamification Engine Functions
+    
+    
     function addXP(amount, source, element) {
       const multiplier = getXPMultiplier();
       const finalAmount = Math.round(amount * multiplier);
       
       appState.gamification.xp += finalAmount;
       
-      // Check for level up
       checkLevelUp();
       
-      // Update header display
       updateGamificationHeader();
       
-      // Create XP bubble animation
       if (element) {
         createXPBubble(finalAmount, element);
       }
       
-      // Check for combo
+     
       updateCombo();
       
-      // Save state
+      
       save();
       
       return finalAmount;
     }
     
-    // Create XP bubble animation
     function createXPBubble(amount, element) {
       const rect = element.getBoundingClientRect();
       const bubble = document.createElement('div');
@@ -1280,11 +1270,9 @@
       }, 1500);
     }
     
-    // Get XP multiplier based on streak and combo
     function getXPMultiplier() {
       let multiplier = 1;
       
-      // Streak multiplier
       const streak = appState.gamification.streak;
       if (streak >= 30 && GAMIFICATION_CONFIG.streakBonus[30]) {
         multiplier *= GAMIFICATION_CONFIG.streakBonus[30].xpMultiplier;
@@ -1296,7 +1284,6 @@
         multiplier *= GAMIFICATION_CONFIG.streakBonus[3].xpMultiplier;
       }
       
-      // Combo multiplier
       const combo = appState.gamification.combo;
       if (combo >= 5 && GAMIFICATION_CONFIG.comboMultipliers[5]) {
         multiplier *= GAMIFICATION_CONFIG.comboMultipliers[5];
@@ -1311,12 +1298,10 @@
       return multiplier;
     }
     
-    // Check for level up
     function checkLevelUp() {
       const currentLevel = appState.gamification.level;
       const xp = appState.gamification.xp;
       
-      // Find the next level threshold
       let nextLevel = currentLevel;
       for (let i = 0; i < GAMIFICATION_CONFIG.levelThresholds.length; i++) {
         if (xp >= GAMIFICATION_CONFIG.levelThresholds[i]) {
@@ -1331,19 +1316,15 @@
         appState.gamification.level = nextLevel;
         appState.gamification.xpToNextLevel = GAMIFICATION_CONFIG.levelThresholds[nextLevel + 1] || GAMIFICATION_CONFIG.levelThresholds[nextLevel] * 1.5;
         
-        // Award health coins
         const coinsEarned = nextLevel * 2;
         appState.gamification.healthCoins += coinsEarned;
         
-        // Show level up animation
         showLevelUpAnimation(nextLevel, coinsEarned);
         
-        // Check for level-based badges
         checkBadgeUnlock(`level-${nextLevel}`);
       }
     }
     
-    // Show level up animation
     function showLevelUpAnimation(newLevel, coinsEarned) {
       const animation = document.getElementById('level-up-animation');
       const newLevelDisplay = document.getElementById('new-level-display');
@@ -1356,10 +1337,8 @@
       
       animation.style.display = 'flex';
       
-      // Play sound
       SOUNDS.levelUp.play();
       
-      // Trigger confetti
       confetti({
         particleCount: 150,
         spread: 70,
@@ -1367,37 +1346,29 @@
       });
     }
     
-    // Close level up animation
     document.getElementById('close-level-up').addEventListener('click', function() {
       document.getElementById('level-up-animation').style.display = 'none';
     });
     
-    // Update combo system
     function updateCombo() {
       const now = Date.now();
       const lastComboTime = appState.gamification.lastComboTime;
       
-      // If within combo time window, increase combo
       if (now - lastComboTime < GAMIFICATION_CONFIG.comboTimeWindow) {
         appState.gamification.combo++;
         
-        // Show combo indicator
         showComboIndicator();
         
-        // Check for combo badge
         if (appState.gamification.combo === 5) {
           checkBadgeUnlock('combo-5');
         }
       } else {
-        // Reset combo
         appState.gamification.combo = 1;
       }
       
-      // Update last combo time
       appState.gamification.lastComboTime = now;
     }
     
-    // Show combo indicator
     function showComboIndicator() {
       const comboIndicator = document.getElementById('combo-indicator');
       const comboCount = document.getElementById('combo-count');
@@ -1405,23 +1376,19 @@
       comboCount.textContent = appState.gamification.combo;
       comboIndicator.style.display = 'block';
       
-      // Play combo sound for high combos
       if (appState.gamification.combo >= 3) {
         SOUNDS.combo.play();
       }
       
-      // Hide after 3 seconds
       setTimeout(() => {
         comboIndicator.style.display = 'none';
       }, 3000);
     }
     
-    // Check and unlock badges
     function checkBadgeUnlock(badgeId) {
       if (!appState.gamification.badges.includes(badgeId) && GAMIFICATION_CONFIG.badges[badgeId]) {
         appState.gamification.badges.push(badgeId);
         
-        // Show badge unlock animation
         showBadgeUnlockAnimation(badgeId);
         
         return true;
@@ -1429,9 +1396,7 @@
       return false;
     }
     
-    // Show badge unlock animation
     function showBadgeUnlockAnimation(badgeId) {
-      // Create a temporary element for the animation
       const badge = GAMIFICATION_CONFIG.badges[badgeId];
       const badgeElement = document.createElement('div');
       badgeElement.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-2xl shadow-2xl text-center z-50 badge-unlocked';
@@ -1446,36 +1411,29 @@
       document.body.appendChild(badgeElement);
       refreshIconsSoon();
       
-      // Play sound
       SOUNDS.badgeUnlock.play();
       
-      // Auto-remove after 3 seconds
       setTimeout(() => {
         badgeElement.remove();
       }, 3000);
       
-      // Add click to close
       badgeElement.querySelector('button').addEventListener('click', () => {
         badgeElement.remove();
       });
     }
     
-    // Update streak
     function updateStreak() {
       const today = new Date().toDateString();
       const lastActivityDate = appState.gamification.lastActivityDate;
       
-      // If last activity was yesterday, increment streak
       const lastDate = new Date(lastActivityDate);
       const todayDate = new Date(today);
       const diffTime = Math.abs(todayDate - lastDate);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
       if (diffDays === 1) {
-        // Consecutive day - increment streak
         appState.gamification.streak++;
         
-        // Check for streak badges
         if (appState.gamification.streak === 3) {
           checkBadgeUnlock('streak-3');
         } else if (appState.gamification.streak === 7) {
@@ -1486,7 +1444,6 @@
           checkBadgeUnlock('streak-30');
         }
         
-        // Play streak sound for significant streaks
         if (appState.gamification.streak >= 7) {
           SOUNDS.streak.play();
         }
@@ -1494,31 +1451,27 @@
         // Streak broken - reset to 1
         appState.gamification.streak = 1;
       }
-      // If same day, streak remains the same
+     
       
-      // Update last activity date
+      
       appState.gamification.lastActivityDate = today;
     }
     
-    // Update gamification header
     function updateGamificationHeader() {
       document.getElementById('header-streak').textContent = appState.gamification.streak;
       document.getElementById('header-level').textContent = appState.gamification.level;
       document.getElementById('header-xp').textContent = `${appState.gamification.xp}/${appState.gamification.xpToNextLevel}`;
     }
     
-    // Open mystery box
     function openMysteryBox() {
       if (appState.gamification.healthCoins < 10) {
         alert("You need 10 Health Coins to open a Mystery Box!");
         return;
       }
       
-      // Deduct coins
       appState.gamification.healthCoins -= 10;
       appState.gamification.mysteryBoxesOpened++;
       
-      // Get random reward
       const random = Math.random();
       let cumulativeProbability = 0;
       let reward = null;
@@ -1531,7 +1484,6 @@
         }
       }
       
-      // Apply reward
       if (reward) {
         let message = "";
         
@@ -1551,7 +1503,7 @@
             break;
         }
         
-        // Show reward message
+        
         alert(`Mystery Box Reward!\n\n${message}`);
       }
       
@@ -1559,7 +1511,7 @@
       renderGamificationPage();
     }
     
-    // Share achievement
+    
     function shareAchievement(type, value) {
       const shareCard = document.createElement('div');
       shareCard.className = 'share-card animate-zoom-in';
@@ -1585,9 +1537,9 @@
       refreshIconsSoon();
     }
 
-    // ================
+   
     // Theme handling
-    // ================
+    
     const themeSelect = document.getElementById('theme-select');
     const storedTheme = localStorage.getItem('rpmTheme') || 'neon';
     document.body.setAttribute('data-theme', storedTheme);
@@ -1595,38 +1547,38 @@
     function applyTheme(theme){ document.body.setAttribute('data-theme', theme); localStorage.setItem('rpmTheme', theme); }
     themeSelect.addEventListener('change', (e)=> applyTheme(e.target.value));
 
-    // ================
+    
     // Language handling
-    // ================
+    
     const languageSelect = document.getElementById('language-select');
     languageSelect.value = currentLanguage;
     languageSelect.addEventListener('change', (e)=> setLanguage(e.target.value));
 
-    // ===================
+   
     // Render: Header
-    // ===================
+   
     function renderHeader(){
       document.getElementById('header-user-name').textContent = appState.profile.name;
       const hv = [ {k:'hr',i:'heart',l:t('home.vitals.hr'),v:appState.vitals.hr}, {k:'bp',i:'thermometer-half',l:t('home.vitals.bp'),v:appState.vitals.bp.replace('/', ' / ')}, {k:'bg',i:'droplet',l:t('home.vitals.bg'),v:appState.vitals.bg}, {k:'spo2',i:'wind',l:t('home.vitals.spo2'),v:appState.vitals.spo2} ];
       const header = document.getElementById('header-vitals-display');
       header.innerHTML = hv.map(v=>`<div class='flex items-center gap-1'><i data-lucide='${v.i}' class='w-4 h-4' style="color: var(--muted-2)"></i><span style="color: var(--muted-2)">${v.l}:</span><span class='font-bold' style="color: var(--fg)">${v.v}</span></div>`).join('');
       
-      // Update gamification header
+      
       updateGamificationHeader();
     }
 
-    // ===================
+   
     // Vitals Management
-    // ===================
+   
     function updateVital(key, value) {
       appState.vitals[key] = value;
       save();
       renderHeader();
       
-      // Add XP for updating vitals
+     
       const xpEarned = addXP(GAMIFICATION_CONFIG.xpPerVital, 'vital-update', document.querySelector(`[onchange*="${key}"]`));
       
-      // Show confirmation
+     
       const status = document.getElementById('vitals-status');
       if (status) {
         status.textContent = `${t('common.save')}! +${xpEarned} XP`;
@@ -1659,9 +1611,9 @@
       }
     }
 
-    // ===================
+   
     // Render: Home page
-    // ===================
+   
     function renderHome(){
       const score = calculateHealthScore();
       const dosesTaken = appState.tasks.filter(t => t.icon === 'Pill' && t.isChecked).length;
@@ -1866,9 +1818,9 @@
       refreshIconsSoon();
     }
 
-    // ===================
+   
     // Render: To‑Do page
-    // ===================
+    
     function renderTodo(){
       const remaining = appState.tasks.filter(t=>!t.isChecked).length;
       const todo = document.getElementById('todo-content');
@@ -1920,7 +1872,7 @@
         </div>
       `;
 
-      // Render tasks list
+     
       const list = todo.querySelector('#task-list');
       const frag = document.createDocumentFragment();
       const tasks = [...appState.tasks].sort((a,b)=> a.timeMM-b.timeMM || (a.isChecked - b.isChecked));
@@ -1981,7 +1933,7 @@
         statusLbl.className = 'text-xs'; 
         statusLbl.style.color = isDone? 'var(--ok)' : (statusText===t('todo.status.pending')? 'var(--danger)' : 'var(--muted-2)');
         
-        // Add delete button
+      
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'p-1 text-red-500 hover:bg-red-50 rounded transition-colors';
         deleteBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i>';
@@ -2000,7 +1952,7 @@
       list.innerHTML=''; 
       list.appendChild(frag);
 
-      // Add-task form handler
+     
       todo.querySelector('#add-task-form').onsubmit = (e)=>{
         e.preventDefault();
         const title = todo.querySelector('#new-task-title').value.trim();
@@ -2015,9 +1967,9 @@
       refreshIconsSoon();
     }
 
-    // ===================
+   
     // Delete task function
-    // ===================
+    
     function deleteTask(id) {
       if (confirm("Are you sure you want to delete this milestone?")) {
         appState.tasks = appState.tasks.filter(t => t.id !== id);
@@ -2027,9 +1979,9 @@
       }
     }
 
-    // ===================
+    
     // Render: Progress page
-    // ===================
+   
     function renderProgress(){
       const game = appState.gamification;
       const progress = document.getElementById('progress-content');
@@ -2068,7 +2020,7 @@
         </div>
       `;
 
-      // Render badges
+      
       const grid = progress.querySelector('#badges-container');
       const userBadges = appState.gamification.badges;
       
@@ -2085,7 +2037,7 @@
         </div>`;
       }).join('');
 
-      // Risk Forecasting chart
+      
       const chartContainer = progress.querySelector('#chart-container');
       const chartLabels = progress.querySelector('#chart-labels');
       chartContainer.innerHTML = ''; chartLabels.innerHTML = '';
@@ -2102,9 +2054,9 @@
       refreshIconsSoon();
     }
 
-    // ===================
+    
     // Render: Gamification page
-    // ===================
+  
     function renderGamificationPage() {
       const game = appState.gamification;
       const gamification = document.getElementById('gamification-content');
@@ -2196,9 +2148,9 @@
       refreshIconsSoon();
     }
 
-    // ===================
-    // Medication Management Functions
-    // ===================
+   
+   
+   
     function addMedication() {
       const newMedInput = document.getElementById('new-medication');
       const medication = newMedInput.value.trim();
@@ -2210,7 +2162,7 @@
         appState.profile.medications.push(medication);
         newMedInput.value = '';
         save();
-        renderSettings(); // Re-render to show updated list
+        renderSettings(); 
       }
     }
 
@@ -2225,13 +2177,13 @@
       if (appState.profile.medications && appState.profile.medications[index]) {
         appState.profile.medications.splice(index, 1);
         save();
-        renderSettings(); // Re-render to show updated list
+        renderSettings(); 
       }
     }
 
-    // ===================
+ 
     // Render: Settings page
-    // ===================
+   
     function renderSettings(){
       const s = document.getElementById('settings-content');
       s.innerHTML = `
@@ -2360,13 +2312,11 @@
         </div>
       `;
 
-      // Populate profile form values
       s.querySelector('#profile-name').value = appState.profile.name || '';
       s.querySelector('#profile-dob').value = appState.profile.dob || '';
       s.querySelector('#profile-conditions').value = appState.profile.conditions || '';
       s.querySelector('#profile-emergency-contact').value = appState.profile.emergencyContact || '';
 
-      // Profile save
       s.querySelector('#profile-form').onsubmit = (e)=>{
         e.preventDefault();
         appState.profile = {
@@ -2388,11 +2338,10 @@
         }, 1200);
       };
 
-      // Export health data
       const exportStatus = s.querySelector('#export-status');
       s.querySelector('#export-abdm-btn').onclick = ()=>{
         exportStatus.textContent = 'Preparing health data export…';
-        // Build csv
+       
         const headers = 'Date,Heart Rate,Blood Pressure,Blood Glucose,SpO2,Compliance Score\n';
         const rows = appState.healthData.map(d => `${d.day},${appState.vitals.hr},${appState.vitals.bp},${appState.vitals.bg},${appState.vitals.spo2},${d.score}`).join('\n');
         const csv = headers + rows;
@@ -2410,45 +2359,40 @@
         exportStatus.textContent = 'Medication data exported successfully!'; setTimeout(()=> exportStatus.textContent = '', 2500);
       };
 
-      // Share buttons
+     
       s.querySelector('#alert-family-btn').onclick = ()=> triggerSmartAlert('family', `Patient health compliance is at ${calculateHealthScore()}%. Just checking in.`);
       s.querySelector('#alert-doctor-btn').onclick = ()=> triggerSmartAlert('doctor', `Secure daily report: Compliance ${calculateHealthScore()}%. Vitals: HR ${appState.vitals.hr}, BP ${appState.vitals.bp}.`);
 
       refreshIconsSoon();
     }
 
-    // ===================
-    // Global actions: Tasks & Alerts
-    // ===================
+   
+    // actions: Tasks & Alerts
+   
     window.toggleTask = (id) => {
       const t = appState.tasks.find(x=>x.id===id); 
       if(!t) return; 
       
       t.isChecked = !t.isChecked; 
       
-      // Update streak
+    
       updateStreak();
       
-      // Add XP for task completion
       if (t.isChecked) {
         let xpAmount = GAMIFICATION_CONFIG.xpPerTask;
         
-        // Bonus XP for medication tasks
         if (t.icon === 'Pill') {
           xpAmount = GAMIFICATION_CONFIG.xpPerMedication;
         }
         
         const xpEarned = addXP(xpAmount, 'task-complete', document.querySelector(`[onclick*="${id}"]`));
         
-        // Play sound
         SOUNDS.taskComplete.play();
         
-        // Check for task-related badges
         if (appState.tasks.filter(task => task.isChecked).length >= 10) {
           checkBadgeUnlock('task-master');
         }
         
-        // Show confetti for completed tasks
         confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
       }
       
@@ -2458,7 +2402,7 @@
       renderProgress();
     };
 
-    // SOS & Alerts
+   
     let alertTimeout=null, countdownInterval=null; const ALERT_HOLD_DURATION=3000;
     const countdownDisplay = document.getElementById('countdown-display');
     const sirenIcon = document.getElementById('siren-icon');
@@ -2493,14 +2437,14 @@
       console.log(`[Smart Alert] ${to}: ${msg}`);
     };
 
-    // ===================
+    
     // Page switching
-    // ===================
+    
     function changePage(p, btn){
       document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
       document.querySelector(`#page-${p}`).classList.add('active');
       
-      // Only update bottom nav if a button was clicked
+     
       if (btn) {
         document.querySelectorAll('#bottom-nav .nav-item').forEach(el=>{
           el.classList.remove('active'); 
@@ -2513,7 +2457,7 @@
       appState.currentPage = p; 
       save();
 
-      // Render per-page content on navigation
+      
       if (p==='home') renderHome();
       if (p==='todo') renderTodo();
       if (p==='progress') renderProgress();
@@ -2532,9 +2476,9 @@
       if (appState.currentPage === 'settings') renderSettings();
     }
 
-    // ===================
-    // Mobile menu functionality
-    // ===================
+    
+    // Mobile menu funcntionality
+    
     document.addEventListener('DOMContentLoaded', ()=>{
       const mobileMenuBtn = document.getElementById('mobile-menu-btn');
       const floatingHeader = document.getElementById('floating-header');
@@ -2542,7 +2486,7 @@
       if (mobileMenuBtn && floatingHeader) {
         mobileMenuBtn.addEventListener('click', () => {
           floatingHeader.classList.toggle('mobile-menu-open');
-          // Toggle menu icon
+         
           const icon = mobileMenuBtn.querySelector('i');
           if (floatingHeader.classList.contains('mobile-menu-open')) {
             icon.setAttribute('data-lucide', 'x');
@@ -2557,11 +2501,9 @@
       renderAllPages();
       refreshIconsSoon();
       
-      // Initialize streak on app load
+     
       updateStreak();
     });
   </script>
 </body>
-
 </html>
-
