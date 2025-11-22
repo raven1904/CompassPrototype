@@ -8,18 +8,18 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         
-        /* ------------------- COLOR SCHEME & FONTS ------------------- */
+       
         :root {
-            /* RPM Compliance Coach Color Scheme */
-            --color-primary: #8B5CF6;     /* Vibrant Purple */
-            --color-secondary: #06B6D4;   /* Fresh Cyan */
-            --color-accent: #F97316;      /* Orange Accent */
-            --color-bg-start: #FAFBFF;    /* Light Blue-White */
-            --color-bg-end: #F0F4FF;      /* Soft Blue Tint */
-            --color-text: #1F2937;        /* Dark Gray */
-            --color-muted: #6B7280;       /* Medium Gray */
-            --color-success: #10B981;     /* Emerald Green */
-            --color-danger: #EF4444;      /* Red */
+           
+            --color-primary: #8B5CF6;    
+            --color-secondary: #06B6D4;   
+            --color-accent: #F97316;     
+            --color-bg-start: #FAFBFF;    
+            --color-bg-end: #F0F4FF;      
+            --color-text: #1F2937;       
+            --color-muted: #6B7280;      
+            --color-success: #10B981;    
+            --color-danger: #EF4444;      
         }
 
         body {
@@ -29,7 +29,6 @@
             overflow: hidden; 
         }
 
-        /* ------------------- ANIMATIONS & UTILITIES ------------------- */
         @keyframes float {
             0% { transform: translate(0, 0) rotate(0deg); opacity: 0.8; }
             52% { transform: translate(20px, 30px) rotate(5deg); opacity: 0.6; }
@@ -67,19 +66,18 @@
 
         .animated-symbol {
             position: absolute;
-            color: rgba(139, 92, 246, 0.4); /* Increased visibility */
+            color: rgba(139, 92, 246, 0.4); 
             font-size: 30px;
             pointer-events: none;
             animation: move 20s linear infinite, float 10s ease-in-out infinite alternate;
         }
 
         .glassmorphism {
-            /* Lighter, more transparent glass effect */
-            background: rgba(255, 255, 255, 0.65); /* Reduced intensity */
+            background: rgba(255, 255, 255, 0.65); 
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(139, 92, 246, 0.15); /* Softer border */
+            border: 1px solid rgba(139, 92, 246, 0.15); 
             box-shadow: 
-                0 8px 32px rgba(139, 92, 246, 0.08), /* Softer shadow */
+                0 8px 32px rgba(139, 92, 246, 0.08),
                 0 2px 8px rgba(139, 92, 246, 0.03),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
             transition: all 0.3s ease;
@@ -130,12 +128,10 @@
             animation: pulse-glow 2s ease-in-out infinite;
         }
         
-        /* Transition utility for signup fields */
         .h-transition {
             transition: all 0.4s ease-in-out, margin 0.3s ease-in-out;
         }
 
-        /* Cyber-border effect matching RPM theme */
         .cyber-border {
             position: relative;
         }
@@ -146,11 +142,11 @@
             background: linear-gradient(45deg, var(--color-primary), var(--color-secondary), var(--color-accent), var(--color-primary));
             border-radius: inherit;
             z-index: -1;
-            opacity: 0.4; /* Reduced intensity */
+            opacity: 0.4; 
             filter: blur(8px);
         }
 
-        /* Neon title effect */
+        
         .neon-title {
             background: linear-gradient(90deg, 
                 color-mix(in oklab, var(--color-primary) 80%, white 10%), 
@@ -170,13 +166,11 @@
             100% { background-position: 200% 0; }
         }
 
-        /* Enhanced input fields for better visibility */
         .input-field {
             background: rgba(255, 255, 255, 0.9) !important;
             border: 1px solid rgba(139, 92, 246, 0.2) !important;
         }
 
-        /* Better contrast for labels */
         .form-label {
             color: var(--color-text) !important;
             font-weight: 500 !important;
@@ -186,13 +180,13 @@
 </head>
 <body class="flex items-center justify-center p-4">
 
-    <!-- Floating Medical Symbols Background -->
+    <!-- Floating Symbols Background -->
     <div id="symbols-container" class="absolute inset-0 z-0"></div>
 
-    <!-- Welcome Animation Screen (SUCCESS) -->
+    <!-- Welcome Animation Screen -->
     <div id="welcome-screen" class="fixed inset-0 flex flex-col items-center justify-center">
         <div id="welcome-logo" class="p-8 rounded-full cyber-border">
-            <!-- LOGO: PNG Placeholder -->
+           
             <img 
                 src="Compass.png" 
                 alt="COMPASS Logo" 
@@ -211,7 +205,7 @@
     <!-- Login/Signup Card -->
     <div id="login-card" class="glassmorphism p-8 md:p-10 rounded-3xl w-full max-w-md z-10 cyber-border">
         <div class="text-center mb-8">
-            <!-- LOGO: PNG Placeholder -->
+            
             <img 
                 src="Compass.png" 
                 alt="COMPASS Logo" 
@@ -244,7 +238,7 @@
                 </button>
             </div>
             
-            <!-- Confirm Password Field (Initially hidden for Login) -->
+            <!-- Confirm Password Field  -->
             <div id="confirm-password-container" class="h-transition overflow-hidden opacity-0 h-0 mb-0">
                 <div class="mb-6 relative">
                     <label for="confirm-password" class="block text-sm font-medium form-label mb-2">Confirm Password</label>
@@ -284,10 +278,10 @@
             sendPasswordResetEmail
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         
-        // --- AUTH STATE FLAG ---
+        //  AUTH STATE FLAG 
         let appMode = 'login'; // 'login' or 'signup'
 
-        // --- GLOBAL FIREBASE CONFIGURATION (Direct Keys) ---
+        // GLOBAL FIREBASE CONFIGURATION (Direct Keys) 
         const firebaseConfig = {
             apiKey: "AIzaSyChN0ZW9-Ut013DO2skZjg3eudSx_RSboE", 
             authDomain: "compass-pd.firebaseapp.com",
@@ -309,7 +303,7 @@
             console.error("Firebase Initialization Error:", e);
         }
 
-        // --- UI UTILITIES ---
+        // UI UTILITIES 
 
         function showAuthError(message, isCritical = true) {
             const statusElement = document.getElementById('status-message');
@@ -323,7 +317,7 @@
             statusElement.classList.remove('hidden');
             
             if (isCritical) {
-                 // Apply shake and visual error state
+                 //shake and visual error state
                 loginCard.style.border = '1px solid #F87171';
                 loginCard.style.boxShadow = '0 0 25px rgba(239, 68, 68, 0.5)';
                 loginCard.style.animation = 'shake-error 0.5s ease-in-out';
@@ -339,7 +333,7 @@
         function updateFormPrompt(message) {
             const statusElement = document.getElementById('status-message');
             
-            // Apply RPM theme prompt styling
+            //  theme styling
             statusElement.classList.remove('text-red-600', 'border-red-300', 'bg-red-50');
             statusElement.classList.add('text-[--color-primary]', 'border-[--color-primary]', 'bg-[--color-bg-end]');
             
@@ -377,7 +371,7 @@
             }
         }
         
-        // Toggles between login and signup modes, updating the UI
+        // Toggles between login and signup modes
         window.toggleAuthMode = function(newMode) {
             clearStatusMessage();
             const confirmContainer = document.getElementById('confirm-password-container');
@@ -392,7 +386,7 @@
             }
 
             if (appMode === 'signup') {
-                // Show confirm password field
+                // confirm password field
                 confirmContainer.classList.remove('h-0', 'opacity-0', 'mb-0');
                 confirmContainer.classList.add('mb-4');
                 authButton.textContent = "Create Account & Access";
@@ -409,7 +403,7 @@
         }
 
 
-        // --- MAIN HANDLERS ---
+        //  MAIN HANDLERS 
         
         // Unified Authentication Handler
         window.handleAuth = async function() {
@@ -424,13 +418,13 @@
             }
 
             if (appMode === 'signup') {
-                // --- SIGN UP VALIDATION ---
+                //  SIGN UP VALIDATION 
                 if (password !== confirmPassword) {
                     showAuthError("Passwords do not match.");
                     return;
                 }
                 
-                // --- SIGN UP LOGIC ---
+                // SIGN UP LOGIC
                 try {
                     await createUserWithEmailAndPassword(auth, email, password);
                     console.log("Account successfully created!");
@@ -441,7 +435,7 @@
                     
                     if (error.code === 'auth/email-already-in-use') {
                         errorMessage = "This account already exists. Switching to Log In mode...";
-                        toggleAuthMode('login'); // Switch mode for next attempt
+                        toggleAuthMode('login'); 
                     } else if (error.code === 'auth/weak-password') {
                          errorMessage = "The password must be at least 6 characters long.";
                     }
@@ -449,7 +443,7 @@
                 }
 
             } else {
-                // --- LOGIN LOGIC ---
+                //  LOGIN LOGIC 
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                     redirectToDashboard();
@@ -460,10 +454,10 @@
                     let errorMessage = "Login failed. Please check your credentials.";
                     
                     if (error.code === 'auth/user-not-found') {
-                        // Crucial step: User not found, switch to signup mode and prompt
+                        // Crucial step: User not found, switch to signup mode 
                         updateFormPrompt(`The account **${email}** was not found. Please click the button below to **Create Account**.`);
                         toggleAuthMode('signup'); 
-                        return; // Exit without showing shake/critical error
+                        return;
                     } else if (error.code === 'auth/wrong-password') {
                         errorMessage = "Invalid password.";
                     } else if (error.code === 'auth/invalid-email') {
@@ -475,7 +469,7 @@
             }
         };
 
-        // Handles password reset via email
+        //password reset via email
         window.handlePasswordReset = async function() {
             const email = document.getElementById('email').value.trim();
             clearStatusMessage();
@@ -499,7 +493,7 @@
         };
 
 
-        // --- BACKGROUND GENERATION ---
+        // BACKGROUND GENERATION 
         document.addEventListener('DOMContentLoaded', () => {
             const symbolsContainer = document.getElementById('symbols-container');
             const symbols = [
@@ -509,18 +503,18 @@
                 `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM7 5h10v14H7V5zm2 2h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z"/></svg>` // Capsule
             ];
 
-            for (let i = 0; i < 40; i++) { // Increased number of symbols
+            for (let i = 0; i < 40; i++) { 
                 const symbol = document.createElement('div');
                 symbol.className = 'animated-symbol';
                 symbol.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
                 
-                const size = Math.random() * 25 + 25; // Increased size range
+                const size = Math.random() * 25 + 25; 
                 symbol.style.fontSize = `${size}px`;
                 symbol.style.left = `${Math.random() * 100}vw`;
                 symbol.style.top = `${Math.random() * 100}vh`;
-                symbol.style.animationDelay = `${Math.random() * 15}s`; // Faster animation
-                symbol.style.animationDuration = `${Math.random() * 10 + 15}s`; // Faster movement
-                symbol.style.opacity = `${Math.random() * 0.5 + 0.3}`; // Increased opacity
+                symbol.style.animationDelay = `${Math.random() * 15}s`; 
+                symbol.style.animationDuration = `${Math.random() * 10 + 15}s`; 
+                symbol.style.opacity = `${Math.random() * 0.5 + 0.3}`; 
                 symbol.style.transform = `scale(${Math.random() * 0.7 + 0.5})`;
 
                 symbolsContainer.appendChild(symbol);
