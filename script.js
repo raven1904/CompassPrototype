@@ -45,8 +45,8 @@ function initTheme() {
 
 function applyThemeEffects() {
   // Add floating animations to cards
-  document.querySelectorAll('.card').forEach((card, index) => {
-    card.style.animationDelay = `${index * 0.1}s`;
+  document.querySelectorAll('.card').forEach((card, home) => {
+    card.style.animationDelay = `${home * 0.1}s`;
     if (!card.classList.contains('slide-up-animation')) {
       card.classList.add('slide-up-animation');
     }
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Set active nav item
-  const currentPage = window.location.pathname.split('/').pop().split('.')[0] || 'index';
+  const currentPage = window.location.pathname.split('/').pop().split('.')[0] || 'home';
   document.querySelectorAll('.nav-item').forEach(item => {
     if (item.getAttribute('href')?.includes(currentPage)) {
       item.classList.add('active');
@@ -220,7 +220,7 @@ function initHeader() {
       // If we're already on settings page, go home instead
       if (window.location.pathname.includes('settings.html')) {
         e.preventDefault();
-        window.location.href = 'index.html';
+        window.location.href = 'home.html';
       }
     });
   }
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Set active nav item
-  const currentPage = window.location.pathname.split('/').pop().split('.')[0] || 'index';
+  const currentPage = window.location.pathname.split('/').pop().split('.')[0] || 'home';
   document.querySelectorAll('.nav-item').forEach(item => {
     if (item.getAttribute('href')?.includes(currentPage)) {
       item.classList.add('active');
