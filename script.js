@@ -619,3 +619,214 @@ function getUserId() {
   }
   return userId;
 }
+// ====================
+// SIMPLE AUTO VITAL MONITOR
+// ====================
+
+let vitalInterval = null;
+let currentPopup = null;
+
+// Simple thresholds
+const THRESHOLDS = {
+  hr: 110,      // Heart Rate above this shows popup
+  bp: 140,      // Systolic BP above this shows popup  
+  glucose: 180, // Glucose above this shows popup
+  spo2: 92      // SpO2 below this shows popup
+};
+
+// Generate vital data
+function getRandomVitals() {
+  // 30% chance to generate a high value for testing
+  const shouldShowAlert = Math.random() > 0.7;
+  
+  return {
+    hr: shouldShowAlert ? 
+        115 + Math.floor(Math.random() * 20) : // High: 115-135
+        60 + Math.floor(Math.random() * 40),   // Normal: 60-100
+        
+    bp: shouldShowAlert ? 
+        `${145 + Math.floor(Math.random() * 20)}/${85 + Math.floor(Math.random() * 15)}` : // High
+        `${110 + Math.floor(Math.random() * 20)}/${70 + Math.floor(Math.random() * 10)}`,  // Normal
+        
+    glucose: shouldShowAlert ?
+        190 + Math.floor(Math.random() * 30) : // High: 190-220
+        80 + Math.floor(Math.random() * 40),   // Normal: 80-120
+        
+    spo2: shouldShowAlert ?
+        90 + Math.floor(Math.random() * 3) :   // Low: 90-93
+        95 + Math.floor(Math.random() * 4)     // Normal: 95-99
+  };
+}
+
+// Check if vitals need alert
+function checkForAlert(vitals) {
+  const [systolic] = vitals.bp.split('/').map(Number);
+  
+  if (vitals.hr >= THRESHOLDS.hr) {
+    return {
+      type: 'hr',
+      value: vitals.hr,
+      message: `High Heart Rate: ${vitals.hr} BPM`
+    };
+  }
+  
+  if (systolic >= THRESHOLDS.bp) {
+    return {
+      type: 'bp',
+      value: vitals.bp,
+      message: `High Blood Pressure: ${vitals.bp}`
+    };
+  }
+  
+  if (vitals.glucose >= THRESHOLDS.glucose) {
+    return {
+      type: 'glucose',
+      value: vitals.glucose,
+      message: `High Blood Sugar: ${vitals.glucose} mg/dL`
+    };
+  }
+  
+  if (vitals.spo2 <= THRESHOLDS.spo2) {
+    return {
+      type: 'spo2',
+      value: vitals.spo2,
+      message: `Low Oxygen: ${vitals.spo2}%`
+    };
+  }
+  
+  return null;
+}
+
+// Show single popup
+function showSinglePopup(alert) {
+  // Remove existing popup
+  if (currentPopup) {
+    currentPopup.remove();
+    currentPopup = null;
+  }
+  
+  // Create popup
+  const popup = document.createElement('div');
+  popup.className = 'vital-popup';
+  currentPopup = popup;
+  
+  // Get icon
+  const icons = {
+    hr: 'heart',
+    bp: 'thermometer',
+    glucose: 'droplet',
+    spo2: 'wind'
+  };
+  
+  // Create popup HTML
+  popup.innerHTML = `
+    <div class="popup-content">
+      <div class="popup-icon">
+        <i data-lucide="${icons[alert.type]}"></i>
+      </div>
+      <div class="popup-text">
+        <div class="popup-title">⚠️ Vital Alert</div>
+        <div class="popup-value">${alert.value}</div>
+        <div class="popup-message">${alert.message}</div>
+      </div>
+      <button class="popup-close" onclick="this.parentElement.parentElement.remove(); currentPopup = null;">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+  `;
+  
+  // Add to page
+  document.body.appendChild(popup);
+  
+  // Initialize icon
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+  
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    if (popup.parentElement) {
+      popup.style.opacity = '0';
+      popup.style.transform = 'translateX(20px)';
+      setTimeout(() => {
+        popup.remove();
+        currentPopup = null;
+      }, 300);
+    }
+  }, 3000);
+}
+
+// Update dashboard vitals
+function updateDashboard(vitals) {
+  // Update heart rate
+  const hrElement = document.querySelector('.vital-item:nth-child(1) span');
+  if (hrElement) hrElement.textContent = vitals.hr;
+  
+  // Update blood pressure
+  const bpElement = document.querySelector('.vital-item:nth-child(2) span');
+  if (bpElement) bpElement.textContent = vitals.bp;
+  
+  // Update glucose
+  const glucoseElement = document.querySelector('.vital-item:nth-child(3) span');
+  if (glucoseElement) glucoseElement.textContent = vitals.glucose;
+  
+  // Update oxygen
+  const spo2Element = document.querySelector('.vital-item:nth-child(4) span');
+  if (spo2Element) spo2Element.textContent = vitals.spo2;
+  
+  // Update time
+  const timeElement = document.getElementById('current-time');
+  if (timeElement) {
+    timeElement.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  }
+  
+  return vitals;
+}
+
+// Show toast
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'simple-toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 2000);
+}
+
+// Start automatic monitoring
+function startAutoMonitor() {
+  console.log('✅ Vital monitoring started');
+  
+  // Initial update
+  const vitals = getRandomVitals();
+  updateDashboard(vitals);
+  
+  // Check initial alert
+  const alert = checkForAlert(vitals);
+  if (alert) {
+    showSinglePopup(alert);
+  }
+  
+  // Set interval for updates every 3 seconds
+  vitalInterval = setInterval(() => {
+    const newVitals = getRandomVitals();
+    updateDashboard(newVitals);
+    
+    const newAlert = checkForAlert(newVitals);
+    if (newAlert) {
+      showSinglePopup(newAlert);
+    }
+  }, 3000);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Start monitoring after 2 seconds
+  setTimeout(() => {
+    startAutoMonitor();
+    showToast('Vital monitoring active');
+  }, 2000);
+});
