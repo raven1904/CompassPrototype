@@ -1,0 +1,3777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPASS - Settings</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+    <script src="api.js" defer></script>
+    <script src="script.js" defer></script>
+    <style>
+        /* Add this to fix Profile Settings input fields */
+.input-field {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid var(--card-border);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--fg);
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+.input-field:hover {
+    border-color: var(--accent-2);
+}
+
+/* Add this for better label styling */
+.settings-card label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--fg);
+    font-size: 15px;
+}
+
+/* Add this for form field containers */
+.settings-card > div > div {
+    margin-bottom: 20px;
+}
+
+/* Add placeholder styling */
+.input-field::placeholder {
+    color: var(--muted-2);
+    opacity: 0.7;
+}
+        .settings-section {
+            margin-bottom: 40px;
+        }
+
+        .settings-card {
+            padding: 30px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+            border: 2px solid var(--card-border);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, var(--muted-2), color-mix(in oklab, var(--muted-2) 50%, transparent));
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .avatar-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-option.selected {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .color-option:hover {
+            transform: scale(1.2);
+        }
+
+        .color-option.selected {
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 2px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .notification-item:hover {
+            border-color: var(--accent-1);
+            transform: translateX(5px);
+        }
+
+        .export-option {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 2px solid var(--card-border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .export-option:hover {
+            border-color: var(--accent-1);
+            transform: translateY(-5px);
+        }
+
+        .danger-zone {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        @keyframes wiggle {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(-5deg);
+            }
+
+            75% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .wiggle {
+            animation: wiggle 0.5s ease-in-out;
+        }
+
+        /* Export Modal Styles */
+        .export-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .export-modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+            border-radius: 25px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--card-border);
+            animation: slideUp 0.3s ease-out;
+            position: relative;
+        }
+
+        .export-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .export-modal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--fg);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .export-modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-2);
+            transition: all 0.3s ease;
+        }
+
+        .export-modal-close:hover {
+            color: var(--fg);
+            transform: rotate(90deg);
+        }
+
+        .export-share-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            border: 2px solid var(--card-border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .share-option:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-1);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
+        }
+
+        .share-option-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .share-option-label {
+            font-weight: bold;
+            color: var(--fg);
+            text-align: center;
+        }
+
+        .export-format-options {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .format-option {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid var(--card-border);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: var(--fg);
+        }
+
+        .format-option.selected {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            border-color: var(--accent-1);
+        }
+
+        .export-preview {
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--fg);
+        }
+
+        /* Additional export buttons */
+        .export-action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .export-action-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .export-action-btn.primary {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+        }
+
+        .export-action-btn.secondary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--card-border);
+            color: var(--fg);
+        }
+
+        .export-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Success message */
+        .export-success {
+            display: none;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            margin-top: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .export-success.show {
+            display: block;
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Export loading state */
+        .export-loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .export-loading.show {
+            display: block;
+        }
+         /* Share Report Cards */
+    .share-report-card {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        border: 2px solid var(--card-border);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .share-report-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-1);
+        box-shadow: 0 10px 20px rgba(139, 92, 246, 0.1);
+    }
+
+    .share-report-card.active {
+        border-color: var(--accent-1);
+        background: rgba(139, 92, 246, 0.05);
+    }
+
+    /* Family Member & Doctor Options */
+    .family-member-option,
+    .doctor-option {
+        padding: 10px 16px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid var(--card-border);
+        border-radius: 12px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .family-member-option:hover,
+    .doctor-option:hover {
+        border-color: var(--accent-1);
+        transform: translateY(-2px);
+    }
+
+    .family-member-option.selected,
+    .doctor-option.selected {
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        color: white;
+        border-color: var(--accent-1);
+    }
+
+    /* Social Sharing */
+    .share-progress-card {
+        padding: 25px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+        border-radius: 20px;
+        border: 2px solid var(--card-border);
+    }
+
+    .social-share-btn {
+        width: 100%;
+        height: 50px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .social-share-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .social-share-btn i {
+        width: 24px;
+        height: 24px;
+    }
+
+    .mini-badge {
+        padding: 4px 10px;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        color: var(--accent-1);
+        white-space: nowrap;
+    }
+
+    /* Share Preview Modal */
+    .share-preview-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .share-preview-content {
+        background: white;
+        border-radius: 25px;
+        padding: 30px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .share-preview-image {
+        width: 100%;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .preview-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    .preview-badge {
+        padding: 8px 15px;
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        color: white;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Loading Animation for Sharing */
+    .sharing-loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .sharing-loading.show {
+        display: block;
+    }
+
+    .pulse {
+        animation: pulse 1.5s infinite;
+    }
+
+    /* Success Message */
+    .share-success {
+        display: none;
+        padding: 20px;
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+        border: 2px solid rgba(34, 197, 94, 0.3);
+        border-radius: 20px;
+        margin-top: 20px;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .share-success.show {
+        display: block;
+    }
+    /* Connection Settings Styles */
+        .connection-option {
+            padding: 20px;
+            border: 2px solid var(--card-border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .connection-option:hover {
+            transform: translateX(5px);
+            border-color: var(--accent-1);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.1);
+        }
+
+        .connection-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .connection-icon i {
+            color: white;
+            width: 24px;
+            height: 24px;
+        }
+
+        .connection-count {
+            margin-top: 8px;
+            padding: 4px 12px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--accent-1);
+            display: inline-block;
+        }
+
+        /* Modal Styles for Connection Settings */
+        .connection-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .connection-modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+            border-radius: 25px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--card-border);
+            animation: slideUp 0.3s ease-out;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .connection-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .connection-modal-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--fg);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .connection-modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-2);
+            transition: all 0.3s ease;
+        }
+
+        .connection-modal-close:hover {
+            color: var(--fg);
+            transform: rotate(90deg);
+        }
+
+        .connection-list {
+            margin-bottom: 25px;
+        }
+
+        .connection-item {
+            padding: 20px;
+            border: 2px solid var(--card-border);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .connection-item:hover {
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        .connection-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .connection-item-name {
+            font-weight: bold;
+            color: var(--fg);
+            font-size: 16px;
+        }
+
+        .connection-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .connection-item-action {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-2);
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .connection-item-action:hover {
+            color: var(--accent-1);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .connection-item-details {
+            color: var(--muted-2);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted-2);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--muted-2);
+        }
+
+        /* Form Styles */
+        .connection-form {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: var(--fg);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px 15px;
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--fg);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .device-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status-connected {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--ok);
+        }
+
+        .status-disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--warn);
+        }
+
+        .status-syncing {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-button.primary {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+        }
+
+        .action-button.secondary {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--card-border);
+            color: var(--fg);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Connection Badges */
+        .connection-badge {
+            padding: 4px 10px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--accent-1);
+            display: inline-block;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Sync Animation */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .syncing {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Input Field Styles */
+        .input-field {
+            width: 100%;
+            padding: 12px 18px;
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--fg);
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .input-field:hover {
+            border-color: color-mix(in oklab, var(--accent-1) 30%, transparent);
+        }
+
+        .input-field::placeholder {
+            color: var(--muted-2);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body data-theme="neon">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="user-info">
+                <div class="user-avatar" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                    <i data-lucide="settings"></i>
+                </div>
+                <div class="greeting">
+                    <h1>Settings & Preferences <span class="text-gradient float-animation">⚙️</span></h1>
+                    <p><i data-lucide="sliders"></i> Customize your COMPASS experience</p>
+                </div>
+            </div>
+
+            <!-- Home Icon -->
+            <a href="index.html" class="header-settings-icon" aria-label="Home">
+                <i data-lucide="home"></i>
+            </a>
+
+            <div class="header-controls">
+                <button class="btn-secondary" onclick="window.location.href='index.html'">
+                    <i data-lucide="arrow-left"></i> Home
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Personalize Your Experience</h1>
+
+        <!-- Profile Settings -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="user" style="color: var(--accent-1);"></i>
+                    Profile Settings
+                </h2>
+
+                <div style="display: grid; gap: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Your Name</label>
+                        <input type="text" id="profileName" class="input-field" value="Rohan Choure"
+                            onchange="updateAppState('profile.name', this.value)"
+                            style="animation: slideUp 0.3s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Date of Birth</label>
+                        <input type="date" id="profileDOB" class="input-field" value="1975-05-15"
+                            onchange="updateAppState('profile.dob', this.value)"
+                            style="animation: slideUp 0.35s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Health Conditions</label>
+                        <input type="text" id="profileConditions" class="input-field" value="Hypertension, Type 2 Diabetes"
+                            onchange="updateAppState('profile.conditions', this.value)"
+                            style="animation: slideUp 0.4s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Emergency Contact</label>
+                        <input type="text" id="profileEmergencyContact" class="input-field" value="Avinash Hugar - (555) 123-4567"
+                            onchange="updateAppState('profile.emergencyContact', this.value)"
+                            style="animation: slideUp 0.5s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Medications (comma-separated)</label>
+                        <input type="text" id="profileMedications" class="input-field" value="Aspirin 75mg, Metformin 500mg, Lisinopril 10mg"
+                            onchange="updateMedications(this.value)"
+                            style="animation: slideUp 0.55s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Profile Avatar</label>
+                        <div class="avatar-grid">
+                            <div class="avatar-option selected"
+                                style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);"
+                                onclick="selectAvatar(this)">👨</div>
+                            <div class="avatar-option" style="background: linear-gradient(135deg, #06B6D4, #38BDF8);"
+                                onclick="selectAvatar(this)">🧔</div>
+                            <div class="avatar-option" style="background: linear-gradient(135deg, #10B981, #34D399);"
+                                onclick="selectAvatar(this)">👴</div>
+                            <div class="avatar-option" style="background: linear-gradient(135deg, #F59E0B, #FBBF24);"
+                                onclick="selectAvatar(this)">🧓</div>
+                            <div class="avatar-option" style="background: linear-gradient(135deg, #F97316, #FB7185);"
+                                onclick="selectAvatar(this)">👨‍⚕️</div>
+                            <div class="avatar-option" style="background: linear-gradient(135deg, #EF4444, #F87171);"
+                                onclick="selectAvatar(this)">🦸</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- Connection Settings -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="users" style="color: var(--accent-1);"></i>
+                    Connection Settings
+                </h2>
+
+                <div style="display: grid; gap: 20px;">
+                    <!-- Doctors Section -->
+                    <div class="connection-option" onclick="showDoctorsModal()">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="connection-icon" style="background: linear-gradient(135deg, #10B981, #34D399);">
+                                <i data-lucide="stethoscope"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: var(--fg);">Doctors</div>
+                                <div style="color: var(--muted-2); font-size: 14px;">Manage your healthcare providers
+                                </div>
+                                <div class="connection-count" id="doctorsCount">Loading...</div>
+                            </div>
+                            <i data-lucide="chevron-right" style="color: var(--muted-2);"></i>
+                        </div>
+                    </div>
+
+                    <!-- Family Members Section -->
+                    <div class="connection-option" onclick="showFamilyModal()">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="connection-icon" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">
+                                <i data-lucide="heart"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: var(--fg);">Family Members</div>
+                                <div style="color: var(--muted-2); font-size: 14px;">Manage emergency contacts</div>
+                                <div class="connection-count" id="familyCount">Loading...</div>
+                            </div>
+                            <i data-lucide="chevron-right" style="color: var(--muted-2);"></i>
+                        </div>
+                    </div>
+
+                    <!-- Health Devices Section -->
+                    <div class="connection-option" onclick="showDevicesModal()">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="connection-icon" style="background: linear-gradient(135deg, #8B5CF6, #A78BFA);">
+                                <i data-lucide="watch"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: bold; color: var(--fg);">Health Devices</div>
+                                <div style="color: var(--muted-2); font-size: 14px;">Connect smart devices</div>
+                                <div class="connection-count" id="devicesCount">Loading...</div>
+                            </div>
+                            <i data-lucide="chevron-right" style="color: var(--muted-2);"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- Vitals -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="activity" style="color: var(--accent-1);"></i>
+                    Current Vitals
+                </h2>
+
+                <div style="display: grid; gap: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Heart Rate (BPM)</label>
+                        <input type="number" id="vitalHR" class="input-field" value="72" min="40" max="200"
+                            onchange="updateAppState('vitals.hr', parseInt(this.value))"
+                            style="animation: slideUp 0.3s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Blood Pressure (mmHg)</label>
+                        <input type="text" id="vitalBP" class="input-field" value="130/80" placeholder="e.g., 130/80"
+                            onchange="updateAppState('vitals.bp', this.value)"
+                            style="animation: slideUp 0.35s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Blood Glucose (mg/dL)</label>
+                        <input type="number" id="vitalBG" class="input-field" value="105" min="50" max="400"
+                            onchange="updateAppState('vitals.bg', parseInt(this.value))"
+                            style="animation: slideUp 0.4s ease-out;">
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--fg);">Oxygen Saturation (%)</label>
+                        <input type="number" id="vitalSPO2" class="input-field" value="97" min="80" max="100"
+                            onchange="updateAppState('vitals.spo2', parseInt(this.value))"
+                            style="animation: slideUp 0.45s ease-out;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme & Appearance -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="palette" style="color: var(--accent-2);"></i>
+                    Theme & Appearance
+                </h2>
+
+                <div style="margin-bottom: 25px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <div style="font-weight: bold; color: var(--fg);">Theme Selection</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Choose your favorite color scheme</div>
+                        </div>
+                        <select class="btn-secondary" id="theme-select">
+                            <option value="neon">Neon</option>
+                            <option value="pastel">Pastel</option>
+                            <option value="contrast">High Contrast</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-top: 20px;">
+                        <div class="color-option selected"
+                            style="background: linear-gradient(135deg, #8B5CF6, #06B6D4, #F97316);"
+                            onclick="selectColor(this)" title="Neon"></div>
+                        <div class="color-option"
+                            style="background: linear-gradient(135deg, #A78BFA, #38BDF8, #FB7185);"
+                            onclick="selectColor(this)" title="Pastel"></div>
+                        <div class="color-option"
+                            style="background: linear-gradient(135deg, #0066FF, #00D4AA, #FF6B00);"
+                            onclick="selectColor(this)" title="High Contrast"></div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <div style="font-weight: bold; color: var(--fg);">Animations</div>
+                        <div style="color: var(--muted-2); font-size: 14px;">Playful animations & effects</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onclick="toggleAnimations(this)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: bold; color: var(--fg);">Confetti Effects</div>
+                        <div style="color: var(--muted-2); font-size: 14px;">Celebrate achievements with confetti</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked onclick="toggleConfetti(this)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="bell" style="color: var(--warn);"></i>
+                    Notifications
+                </h2>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="notification-item">
+                        <div>
+                            <div style="font-weight: bold; color: var(--fg);">Medication Reminders</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Get notified when it's time for
+                                medication</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div>
+                            <div style="font-weight: bold; color: var(--fg);">Task Reminders</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Reminders for scheduled health tasks
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div>
+                            <div style="font-weight: bold; color: var(--fg);">Achievement Alerts</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Celebrate when you earn badges or level
+                                up</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <div>
+                            <div style="font-weight: bold; color: var(--fg);">Health Tips</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Daily health tips and recommendations
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div
+                    style="color: var(--muted-2); font-size: 14px; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 15px;">
+                    <i data-lucide="info" style="margin-right: 8px;"></i>
+                    Notifications are sent at appropriate times to avoid disturbance
+                </div>
+            </div>
+        </div>
+
+        <!-- Data & Privacy -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="shield" style="color: var(--ok);"></i>
+                    Data & Privacy
+                </h2>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="export-option" onclick="showExportModal('health')">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div
+                                style="width: 50px; height: 50px; background: linear-gradient(135deg, #8B5CF6, #A78BFA); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="activity" style="color: white;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; color: var(--fg);">Export Health Data</div>
+                                <div style="color: var(--muted-2); font-size: 14px;">Download your complete health
+                                    history in ABDM format</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="export-option" onclick="showExportModal('medication')">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div
+                                style="width: 50px; height: 50px; background: linear-gradient(135deg, #06B6D4, #38BDF8); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="pill" style="color: white;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; color: var(--fg);">Export Medication History</div>
+                                <div style="color: var(--muted-2); font-size: 14px;">Detailed report of all medications
+                                    taken</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="export-option" onclick="showExportModal('progress')">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div
+                                style="width: 50px; height: 50px; background: linear-gradient(135deg, #10B981, #34D399); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="trending-up" style="color: white;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; color: var(--fg);">Export Progress Report</div>
+                                <div style="color: var(--muted-2); font-size: 14px;">Comprehensive progress analytics
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <div style="font-weight: bold; color: var(--fg);">Data Sharing with Doctor</div>
+                        <div style="color: var(--muted-2); font-size: 14px;">Allow your doctor to view your progress
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: bold; color: var(--fg);">Anonymous Data for Research</div>
+                        <div style="color: var(--muted-2); font-size: 14px;">Help improve COMPASS for everyone</div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+<!-- Share & Notifications -->
+<div class="settings-section">
+    <div class="settings-card">
+        <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+            <i data-lucide="share-2" style="color: #8B5CF6;"></i>
+            Share & Notifications
+        </h2>
+
+        <!-- Family & Doctor Report Sharing -->
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: var(--fg); margin-bottom: 15px; font-size: 18px;">Send Health Reports</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div class="share-report-card" onclick="window.sendFamilyReport(event)">                    
+    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div
+                            style="width: 60px; height: 60px; background: linear-gradient(135deg, #06B6D4, #38BDF8); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="heart" style="color: white;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: var(--fg);">Send to Family</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Share summary with emergency contact
+                            </div>
+                        </div>
+                        <i data-lucide="send" style="color: var(--muted-2);"></i>
+                    </div>
+                    <div class="report-preview" style="display: none;">
+                        <div style="font-size: 12px; color: var(--muted-2); margin-top: 10px;">
+                            ✅ All tasks completed today<br>
+                            💊 Medications taken on time<br>
+                            📈 Vital signs stable<br>
+                            🎯 Daily goals achieved
+                        </div>
+                    </div>
+                </div>
+
+                <div class="share-report-card" onclick="sendDoctorReport(event)">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div
+                            style="width: 60px; height: 60px; background: linear-gradient(135deg, #10B981, #34D399); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="stethoscope" style="color: white;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: var(--fg);">Send to Doctor</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Share detailed report with healthcare
+                                provider</div>
+                        </div>
+                        <i data-lucide="send" style="color: var(--muted-2);"></i>
+                    </div>
+                    <div class="report-preview" style="display: none;">
+                        <div style="font-size: 12px; color: var(--muted-2); margin-top: 10px;">
+                            📊 Detailed vitals history<br>
+                            💊 Medication adherence: 95%<br>
+                            📈 Trends & analytics<br>
+                            📝 Notes & observations
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Member Selection -->
+            <div id="familyMembersSection" style="display: none; margin-top: 20px;">
+                <div style="margin-bottom: 10px; font-weight: bold; color: var(--fg);">Select Family Member</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div class="family-member-option selected" onclick="selectFamilyMember(this, 'avinash')">
+                        <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                        Avinash (Primary)
+                    </div>
+                    <div class="family-member-option" onclick="selectFamilyMember(this, 'priya')">
+                        <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                        Priya
+                    </div>
+                    <div class="family-member-option" onclick="selectFamilyMember(this, 'raj')">
+                        <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                        Raj
+                    </div>
+                    <button class="btn-secondary" style="padding: 8px 12px; font-size: 12px;"
+                        onclick="addNewFamilyMember()">
+                        <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Add
+                    </button>
+                </div>
+            </div>
+
+            <!-- Doctor Selection -->
+            <div id="doctorsSection" style="display: none; margin-top: 20px;">
+                <div style="margin-bottom: 10px; font-weight: bold; color: var(--fg);">Select Doctor</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div class="doctor-option selected" onclick="selectDoctor(this, 'dr_sharma')">
+                        <i data-lucide="stethoscope" style="width: 16px; height: 16px;"></i>
+                        Dr. Sharma
+                    </div>
+                    <div class="doctor-option" onclick="selectDoctor(this, 'dr_patel')">
+                        <i data-lucide="stethoscope" style="width: 16px; height: 16px;"></i>
+                        Dr. Patel
+                    </div>
+                    <button class="btn-secondary" style="padding: 8px 12px; font-size: 12px;"
+                        onclick="addNewDoctor()">
+                        <i data-lucide="plus" style="width: 12px; height: 12px;"></i> Add Doctor
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media Sharing -->
+        <div>
+            <h3 style="color: var(--fg); margin-bottom: 15px; font-size: 18px;">Share Progress on Social Media</h3>
+            <div class="share-progress-card">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div
+                        style="width: 70px; height: 70px; background: linear-gradient(135deg, #8B5CF6, #EC4899); border-radius: 15px; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <i data-lucide="trophy" style="color: white; font-size: 32px;"></i>
+                        <div style="position: absolute; bottom: -5px; right: -5px; background: #F59E0B; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                            5
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; color: var(--fg); font-size: 18px;">My Health Journey</div>
+                        <div style="color: var(--muted-2); font-size: 14px;">Level 8 • 28-day streak • 15 badges</div>
+                        <div style="display: flex; gap: 10px; margin-top: 8px;">
+                            <div class="mini-badge">🏆 Consistency</div>
+                            <div class="mini-badge">💪 Strength</div>
+                            <div class="mini-badge">🎯 Focus</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share Buttons -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px;">
+                    <button class="social-share-btn" onclick="shareOnFacebook()"
+                        style="background: linear-gradient(135deg, #1877F2, #0D5FDB);">
+                        <i data-lucide="facebook" style="color: white;"></i>
+                    </button>
+                    <button class="social-share-btn" onclick="shareOnTwitter()"
+                        style="background: linear-gradient(135deg, #1DA1F2, #0D8BD9);">
+                        <i data-lucide="twitter" style="color: white;"></i>
+                    </button>
+                    <button class="social-share-btn" onclick="shareOnInstagram()"
+                        style="background: linear-gradient(135deg, #E4405F, #C13584);">
+                        <i data-lucide="instagram" style="color: white;"></i>
+                    </button>
+                    <button class="social-share-btn" onclick="shareOnLinkedIn()"
+                        style="background: linear-gradient(135deg, #0A66C2, #004182);">
+                        <i data-lucide="linkedin" style="color: white;"></i>
+                    </button>
+                </div>
+
+                <!-- Custom Message -->
+                <div style="margin-top: 15px;">
+                    <div style="font-weight: bold; color: var(--fg); margin-bottom: 8px; font-size: 14px;">Custom
+                        Message</div>
+                    <textarea id="shareMessage" class="input-field" placeholder="Check out my health journey progress! 🎯💪"
+                        style="height: 80px; resize: none;">I've been taking care of my health with COMPASS! Level 8 with a 28-day streak! 🏆💪 #HealthJourney #COMPASSHealth</textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <div style="font-size: 12px; color: var(--muted-2);">
+                            <i data-lucide="info" style="width: 12px; height: 12px;"></i>
+                            Your personal health data remains private
+                        </div>
+                        <button class="btn-primary" style="padding: 10px 20px; font-size: 14px;"
+                            onclick="generateShareImage()">
+                            <i data-lucide="image"></i> Create Share Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Danger Zone -->
+        <div class="settings-section">
+            <div class="settings-card danger-zone">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: #EF4444;">
+                    <i data-lucide="alert-triangle" style="color: #EF4444;"></i>
+                    Danger Zone
+                </h2>
+
+                <div style="margin-bottom: 20px;">
+                    <div
+                        style="padding: 20px; background: rgba(239, 68, 68, 0.1); border-radius: 15px; margin-bottom: 15px;">
+                        <div style="font-weight: bold; color: #EF4444; margin-bottom: 5px;">Reset All Data</div>
+                        <div style="color: #EF4444; font-size: 14px; opacity: 0.8;">This will delete all your progress,
+                            badges, and settings</div>
+                    </div>
+
+                    <div style="padding: 20px; background: rgba(239, 68, 68, 0.1); border-radius: 15px;">
+                        <div style="font-weight: bold; color: #EF4444; margin-bottom: 5px;">Delete Account</div>
+                        <div style="color: #EF4444; font-size: 14px; opacity: 0.8;">Permanently delete your COMPASS
+                            account</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn-secondary" onclick="resetData()"
+                        style="background: rgba(239, 68, 68, 0.1); color: #EF4444; border-color: #EF4444;">
+                        <i data-lucide="refresh-cw"></i> Reset Data
+                    </button>
+                    <button class="btn-secondary" onclick="deleteAccount()"
+                        style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border-color: #EF4444;">
+                        <i data-lucide="trash-2"></i> Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- About COMPASS -->
+        <div class="settings-section">
+            <div class="settings-card">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px; color: var(--fg);">
+                    <i data-lucide="info" style="color: var(--accent-3);"></i>
+                    About COMPASS
+                </h2>
+
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div
+                            style="width: 60px; height: 60px; background: linear-gradient(135deg, #8B5CF6, #06B6D4, #F97316); border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="compass" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: bold; color: var(--fg);">COMPASS Health</div>
+                            <div style="color: var(--muted-2);">Version 5.0 • Build 2024.12</div>
+                        </div>
+                    </div>
+
+                    <div style="color: var(--muted-2); line-height: 1.6; margin-bottom: 20px;">
+                        COMPASS is your personal health companion that makes managing your health fun and rewarding
+                        through gamification and intuitive design.
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn-secondary" onclick="window.location.href='about.html'">
+                        <i data-lucide="book-open"></i> About Us
+                    </button>
+                    <button class="btn-secondary" onclick="window.location.href='contact.html'">
+                        <i data-lucide="phone"></i> Contact Support
+                    </button>
+                    <button class="btn-secondary" onclick="window.location.href='feedback.html'">
+                        <i data-lucide="message-square"></i> Send Feedback
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div style="text-align: center; margin: 40px 0;">
+            <button class="btn-primary" style="padding: 20px 40px; font-size: 18px;" onclick="saveSettings()">
+                <i data-lucide="save"></i> Save All Changes
+            </button>
+        </div>
+    </main>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="export-modal">
+        <div class="export-modal-content">
+            <div class="export-modal-header">
+                <div class="export-modal-title">
+                    <i data-lucide="download" id="exportModalIcon"></i>
+                    <span id="exportModalTitle">Export Data</span>
+                </div>
+                <button class="export-modal-close" onclick="closeExportModal()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div id="exportModalBody">
+                <!-- Format selection will be inserted here -->
+            </div>
+
+            <div class="export-action-buttons">
+                <button class="export-action-btn secondary" onclick="downloadExport()">
+                    <i data-lucide="download"></i> Download
+                </button>
+                <button class="export-action-btn primary" onclick="shareExport()">
+                    <i data-lucide="share-2"></i> Share
+                </button>
+            </div>
+
+            <div class="export-loading" id="exportLoading">
+                <div style="margin-bottom: 15px;">
+                    <i data-lucide="loader" class="spinning" style="font-size: 32px; color: var(--accent-1);"></i>
+                </div>
+                <div style="font-weight: bold; color: var(--fg);">Preparing your export...</div>
+                <div style="color: var(--muted-2); font-size: 14px;">This may take a few seconds</div>
+            </div>
+
+            <div class="export-success" id="exportSuccess">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <i data-lucide="check-circle" style="color: var(--ok);"></i>
+                    <div style="font-weight: bold; color: var(--fg);">Export Successful!</div>
+                </div>
+                <div style="color: var(--muted-2); font-size: 14px;">
+                    Your data has been exported successfully. You can now share it using the options below.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item">
+            <i data-lucide="home"></i>
+            <span>Home</span>
+        </a>
+        <a href="todo.html" class="nav-item">
+            <i data-lucide="list-checks"></i>
+            <span>To-Do</span>
+        </a>
+
+        <div class="sos-button" onmousedown="startSOSCountdown()"
+            onmouseup='this.innerHTML = "<i data-lucide=\"siren\"></i>"' ontouchstart="startSOSCountdown()"
+            ontouchend='this.innerHTML = "<i data-lucide=\" siren\"></i>"'>
+            <i data-lucide="siren"></i>
+        </div>
+
+        <a href="progress.html" class="nav-item">
+            <i data-lucide="trending-up"></i>
+            <span>Progress</span>
+        </a>
+        <a href="settings.html" class="nav-item active">
+            <i data-lucide="settings"></i>
+            <span>Settings</span>
+        </a>
+    </nav>
+
+    <script>
+        // Settings page functionality
+        let currentAvatar = 0;
+        let animationsEnabled = true;
+        let confettiEnabled = true;
+        let currentExportType = '';
+        let currentExportFormat = 'json';
+
+        // Export data samples (in real app, this would come from database)
+        const exportDataSamples = {
+            health: {
+                title: 'Health Data',
+                icon: 'activity',
+                json: {
+                    patient: "Rohan Choure",
+                    conditions: ["Hypertension", "Type 2 Diabetes"],
+                    vitals: [
+                        { date: "2024-12-01", bp: "130/85", glucose: "145", weight: "78kg" },
+                        { date: "2024-12-02", bp: "128/82", glucose: "138", weight: "77.5kg" },
+                        { date: "2024-12-03", bp: "125/80", glucose: "132", weight: "77kg" }
+                    ],
+                    last_updated: new Date().toISOString()
+                },
+                csv: "Date,Blood Pressure,Glucose,Weight\n2024-12-01,130/85,145,78kg\n2024-12-02,128/82,138,77.5kg\n2024-12-03,125/80,132,77kg"
+            },
+            medication: {
+                title: 'Medication History',
+                icon: 'pill',
+                json: {
+                    patient: "Rohan Choure",
+                    medications: [
+                        { name: "Metformin", dosage: "500mg", frequency: "Twice daily", start_date: "2024-01-15" },
+                        { name: "Lisinopril", dosage: "10mg", frequency: "Once daily", start_date: "2024-02-10" },
+                        { name: "Atorvastatin", dosage: "20mg", frequency: "Once daily", start_date: "2024-03-05" }
+                    ],
+                    adherence_rate: "94%",
+                    last_updated: new Date().toISOString()
+                },
+                csv: "Medication,Dosage,Frequency,Start Date\nMetformin,500mg,Twice daily,2024-01-15\nLisinopril,10mg,Once daily,2024-02-10\nAtorvastatin,20mg,Once daily,2024-03-05"
+            },
+            progress: {
+                title: 'Progress Report',
+                icon: 'trending-up',
+                json: {
+                    patient: "Rohan Choure",
+                    period: "December 2024",
+                    achievements: [
+                        { badge: "Consistency Champion", earned: "2024-12-15" },
+                        { badge: "Glucose Guru", earned: "2024-12-20" },
+                        { badge: "Medication Master", earned: "2024-12-25" }
+                    ],
+                    stats: {
+                        tasks_completed: 45,
+                        streak_days: 28,
+                        glucose_improvement: "18%",
+                        weight_loss: "2.5kg"
+                    },
+                    last_updated: new Date().toISOString()
+                },
+                csv: "Metric,Value\nTasks Completed,45\nStreak Days,28\nGlucose Improvement,18%\nWeight Loss,2.5kg"
+            }
+        };
+
+        function selectAvatar(avatarElement) {
+            document.querySelectorAll('.avatar-option').forEach(avatar => {
+                avatar.classList.remove('selected');
+            });
+
+            avatarElement.classList.add('selected');
+            const avatars = Array.from(document.querySelectorAll('.avatar-option'));
+            currentAvatar = avatars.indexOf(avatarElement);
+
+            avatarElement.classList.add('wiggle');
+            setTimeout(() => {
+                avatarElement.classList.remove('wiggle');
+            }, 500);
+
+            const userAvatar = document.querySelector('.user-avatar');
+            if (userAvatar) {
+                userAvatar.innerHTML = avatarElement.textContent;
+            }
+        }
+
+        function selectColor(colorElement) {
+            document.querySelectorAll('.color-option').forEach(color => {
+                color.classList.remove('selected');
+            });
+
+            colorElement.classList.add('selected');
+            const scheme = colorElement.getAttribute('title').toLowerCase();
+            if (scheme) {
+                document.body.setAttribute('data-theme', scheme);
+                document.getElementById('theme-select').value = scheme;
+                localStorage.setItem('compassTheme', scheme);
+
+                colorElement.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    colorElement.style.transform = 'scale(1.2)';
+                }, 300);
+            }
+        }
+
+        function toggleAnimations(checkbox) {
+            animationsEnabled = checkbox.checked;
+            if (!animationsEnabled) {
+                document.body.classList.add('no-animations');
+                alert('Animations disabled. Page will feel faster but less playful!');
+            } else {
+                document.body.classList.remove('no-animations');
+                alert('Animations enabled! Enjoy the playful experience! 🎉');
+            }
+        }
+
+        function toggleConfetti(checkbox) {
+            confettiEnabled = checkbox.checked;
+            if (confettiEnabled) {
+                alert('Confetti enabled! Get ready for celebrations! 🎊');
+            } else {
+                alert('Confetti disabled. Quiet mode activated.');
+            }
+        }
+
+        function showExportModal(type) {
+            currentExportType = type;
+            const exportData = exportDataSamples[type];
+            
+            if (!exportData) return;
+
+            // Update modal title and icon
+            document.getElementById('exportModalTitle').textContent = `Export ${exportData.title}`;
+            document.getElementById('exportModalIcon').setAttribute('data-lucide', exportData.icon);
+            
+            // Create modal body content
+            const modalBody = document.getElementById('exportModalBody');
+            modalBody.innerHTML = `
+                <div style="color: var(--muted-2); margin-bottom: 20px;">
+                    Select format and preview your ${exportData.title.toLowerCase()}
+                </div>
+                
+                <div class="export-format-options">
+                    <div class="format-option ${currentExportFormat === 'json' ? 'selected' : ''}" 
+                         onclick="selectExportFormat('json')">
+                        JSON
+                    </div>
+                    <div class="format-option ${currentExportFormat === 'csv' ? 'selected' : ''}" 
+                         onclick="selectExportFormat('csv')">
+                        CSV
+                    </div>
+                    <div class="format-option ${currentExportFormat === 'abdm' ? 'selected' : ''}" 
+                         onclick="selectExportFormat('abdm')">
+                        ABDM
+                    </div>
+                </div>
+                
+                <div class="export-preview" id="exportPreview">
+                    ${getExportPreview(type, currentExportFormat)}
+                </div>
+                
+                <div class="export-share-options" id="shareOptions" style="display: none;">
+                    <div class="share-option" onclick="shareViaABDM()">
+                        <div class="share-option-icon" style="background: linear-gradient(135deg, #3B82F6, #60A5FA);">
+                            <i data-lucide="shield"></i>
+                        </div>
+                        <div class="share-option-label">ABDM</div>
+                    </div>
+                    <div class="share-option" onclick="shareViaWhatsApp()">
+                        <div class="share-option-icon" style="background: linear-gradient(135deg, #25D366, #128C7E);">
+                            <i data-lucide="message-circle"></i>
+                        </div>
+                        <div class="share-option-label">WhatsApp</div>
+                    </div>
+                    <div class="share-option" onclick="shareViaEmail()">
+                        <div class="share-option-icon" style="background: linear-gradient(135deg, #EA4335, #FBBC05);">
+                            <i data-lucide="mail"></i>
+                        </div>
+                        <div class="share-option-label">Email</div>
+                    </div>
+                    <div class="share-option" onclick="shareViaSMS()">
+                        <div class="share-option-icon" style="background: linear-gradient(135deg, #34B7F1, #075E54);">
+                            <i data-lucide="smartphone"></i>
+                        </div>
+                        <div class="share-option-label">SMS</div>
+                    </div>
+                </div>
+            `;
+
+            // Show modal
+            document.getElementById('exportModal').style.display = 'flex';
+            
+            // Refresh Lucide icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        function closeExportModal() {
+            document.getElementById('exportModal').style.display = 'none';
+            document.getElementById('exportSuccess').classList.remove('show');
+            document.getElementById('shareOptions').style.display = 'none';
+        }
+
+        function selectExportFormat(format) {
+            currentExportFormat = format;
+            
+            // Update format selection UI
+            document.querySelectorAll('.format-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelectorAll('.format-option')[['json', 'csv', 'abdm'].indexOf(format)].classList.add('selected');
+            
+            // Update preview
+            document.getElementById('exportPreview').innerHTML = getExportPreview(currentExportType, format);
+        }
+
+        function getExportPreview(type, format) {
+            const data = exportDataSamples[type];
+            if (!data) return 'No data available';
+            
+            switch(format) {
+                case 'json':
+                    return `<pre>${JSON.stringify(data.json, null, 2)}</pre>`;
+                case 'csv':
+                    return `<pre>${data.csv}</pre>`;
+                case 'abdm':
+                    return `<pre>ABDM Format - FHIR Compliant\n\nPatient: ${data.json.patient}\nDate: ${new Date().toLocaleDateString()}\nFormat: JSON-LD with Digital Signature</pre>`;
+                default:
+                    return 'Format not supported';
+            }
+        }
+
+        function downloadExport() {
+            const exportData = exportDataSamples[currentExportType];
+            if (!exportData) return;
+
+            // Show loading
+            document.getElementById('exportLoading').classList.add('show');
+            
+            setTimeout(() => {
+                // Hide loading
+                document.getElementById('exportLoading').classList.remove('show');
+                
+                // Create download based on format
+                let content, filename, mimeType;
+                
+                switch(currentExportFormat) {
+                    case 'json':
+                        content = JSON.stringify(exportData.json, null, 2);
+                        filename = `COMPASS_${currentExportType}_${new Date().toISOString().split('T')[0]}.json`;
+                        mimeType = 'application/json';
+                        break;
+                    case 'csv':
+                        content = exportData.csv;
+                        filename = `COMPASS_${currentExportType}_${new Date().toISOString().split('T')[0]}.csv`;
+                        mimeType = 'text/csv';
+                        break;
+                    case 'abdm':
+                        content = JSON.stringify({
+                            ...exportData.json,
+                            format: "ABDM_FHIR",
+                            signature: "DIGITAL_SIGNATURE_PLACEHOLDER",
+                            timestamp: new Date().toISOString()
+                        }, null, 2);
+                        filename = `COMPASS_${currentExportType}_ABDM_${new Date().toISOString().split('T')[0]}.json`;
+                        mimeType = 'application/json';
+                        break;
+                }
+
+                // Create and trigger download
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                // Show success message and share options
+                document.getElementById('exportSuccess').classList.add('show');
+                document.getElementById('shareOptions').style.display = 'grid';
+                
+                // Show notification
+                alert(`✅ ${exportData.title} downloaded successfully as ${currentExportFormat.toUpperCase()}!`);
+            }, 1500);
+        }
+
+        function shareExport() {
+            const exportData = exportDataSamples[currentExportType];
+            if (!exportData) return;
+
+            // Show share options
+            document.getElementById('shareOptions').style.display = 'grid';
+            document.getElementById('exportSuccess').classList.add('show');
+            
+            // Scroll to share options
+            document.getElementById('shareOptions').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function shareViaABDM() {
+            alert(`🔐 Sharing ${exportDataSamples[currentExportType].title} via ABDM (Ayushman Bharat Digital Mission)...\n\nThis would integrate with the ABDM ecosystem for secure health data sharing.`);
+        }
+
+        function shareViaWhatsApp() {
+            const message = `Here's my ${exportDataSamples[currentExportType].title} from COMPASS Health:\n\n${window.location.href}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareViaEmail() {
+            const subject = `My ${exportDataSamples[currentExportType].title} from COMPASS Health`;
+            const body = `Attached is my ${exportDataSamples[currentExportType].title} exported from COMPASS Health.\n\nGenerated on: ${new Date().toLocaleDateString()}`;
+            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function shareViaSMS() {
+            alert(`📱 SMS sharing would send your ${exportDataSamples[currentExportType].title} via text message.\n\nNote: Large files may be truncated in SMS.`);
+        }
+
+        function resetData() {
+            if (confirm('⚠️ Are you sure you want to reset ALL data?\n\nThis will delete all your progress, badges, and settings. This action cannot be undone!')) {
+                if (confirm('🚨 LAST WARNING: This will permanently delete:\n• All health data\n• Progress and achievements\n• Game stats and badges\n• Custom settings\n\nType "RESET" to confirm:')) {
+                    const userInput = prompt('Type "RESET" to confirm:');
+                    if (userInput === 'RESET') {
+                        alert('🧹 Resetting all data...');
+                        setTimeout(() => {
+                            alert('✅ All data has been reset. The page will now refresh.');
+                            window.location.reload();
+                        }, 2000);
+                    }
+                }
+            }
+        }
+
+        function deleteAccount() {
+            alert('🚨 Account deletion is a serious action.\n\nPlease contact support at support@compass.health for account deletion requests.');
+        }
+
+        function saveSettings() {
+            const saveBtn = document.querySelector('.btn-primary');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i data-lucide="loader" class="spinning"></i> Saving...';
+            saveBtn.disabled = true;
+
+            setTimeout(() => {
+                saveBtn.innerHTML = '<i data-lucide="check-circle"></i> Saved Successfully!';
+                saveBtn.style.background = 'linear-gradient(135deg, var(--ok), #34D399)';
+
+                if (confettiEnabled) {
+                    triggerConfetti();
+                }
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '';
+                    saveBtn.disabled = false;
+                    alert('✅ All settings saved successfully!');
+                }, 2000);
+            }, 1500);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add animations to settings cards
+            document.querySelectorAll('.settings-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Add click animations to interactive elements
+            document.querySelectorAll('.avatar-option, .color-option, .export-option').forEach(element => {
+                element.addEventListener('click', function () {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+
+            // Initialize theme from localStorage
+            const savedTheme = localStorage.getItem('compassTheme') || 'neon';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-select').value = savedTheme;
+
+            // Select corresponding color option
+            const colorOptions = document.querySelectorAll('.color-option');
+            colorOptions.forEach(option => {
+                if (option.getAttribute('title').toLowerCase() === savedTheme) {
+                    option.classList.add('selected');
+                }
+            });
+
+            // Theme selector change handler
+            document.getElementById('theme-select').addEventListener('change', function() {
+                const theme = this.value;
+                document.body.setAttribute('data-theme', theme);
+                localStorage.setItem('compassTheme', theme);
+                
+                // Update selected color option
+                colorOptions.forEach(option => {
+                    option.classList.remove('selected');
+                    if (option.getAttribute('title').toLowerCase() === theme) {
+                        option.classList.add('selected');
+                    }
+                });
+            });
+        });
+
+        // Confetti function (placeholder)
+        function triggerConfetti() {
+            console.log('🎊 Confetti would trigger here!');
+            // In a real implementation, you would use a confetti library
+        }
+
+        // ===== APP STATE MANAGEMENT =====
+        function updateAppState(path, value) {
+            // Parse the path and update appState
+            const keys = path.split('.');
+            let obj = appState;
+            
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!obj[keys[i]]) {
+                    obj[keys[i]] = {};
+                }
+                obj = obj[keys[i]];
+            }
+            
+            obj[keys[keys.length - 1]] = value;
+            
+            // Save to localStorage
+            save();
+            
+            console.log(`✅ Updated ${path} to:`, value);
+        }
+
+        function updateMedications(value) {
+            // Split by comma and trim whitespace
+            const meds = value.split(',').map(m => m.trim()).filter(m => m.length > 0);
+            updateAppState('profile.medications', meds);
+        }
+
+        // Initialize form fields from appState
+        function initializeFormFields() {
+            if (appState && appState.profile) {
+                const profileName = document.getElementById('profileName');
+                const profileDOB = document.getElementById('profileDOB');
+                const profileConditions = document.getElementById('profileConditions');
+                const profileEmergencyContact = document.getElementById('profileEmergencyContact');
+                const profileMedications = document.getElementById('profileMedications');
+
+                if (profileName) profileName.value = appState.profile.name || 'Rohan Choure';
+                if (profileDOB) profileDOB.value = appState.profile.dob || '1975-05-15';
+                if (profileConditions) profileConditions.value = appState.profile.conditions || 'Hypertension, Type 2 Diabetes';
+                if (profileEmergencyContact) profileEmergencyContact.value = appState.profile.emergencyContact || 'Avinash Hugar - (555) 123-4567';
+                if (profileMedications) profileMedications.value = (appState.profile.medications || []).join(', ');
+            }
+
+            if (appState && appState.vitals) {
+                const vitalHR = document.getElementById('vitalHR');
+                const vitalBP = document.getElementById('vitalBP');
+                const vitalBG = document.getElementById('vitalBG');
+                const vitalSPO2 = document.getElementById('vitalSPO2');
+
+                if (vitalHR) vitalHR.value = appState.vitals.hr || 72;
+                if (vitalBP) vitalBP.value = appState.vitals.bp || '130/80';
+                if (vitalBG) vitalBG.value = appState.vitals.bg || 105;
+                if (vitalSPO2) vitalSPO2.value = appState.vitals.spo2 || 97;
+            }
+        }
+    </script>
+    <script>
+// Share & Notifications functionality
+let selectedFamilyMember = 'avinash';
+let selectedDoctor = 'dr_sharma';
+let isSendingReport = false;
+
+// Report data (in real app, this would come from your database)
+const reportData = {
+    family: {
+        title: "Daily Health Summary",
+        icon: "heart",
+        content: `
+            👤 Patient: Rohan Choure
+            📅 Date: ${new Date().toLocaleDateString()}
+            
+            ✅ Today's Progress:
+            • All 6 tasks completed
+            • Medications taken on time
+            • 30-min walk completed
+            • Vitals within normal range
+            
+            🏆 Achievements:
+            • 28-day streak maintained
+            • Earned "Consistency Champion" badge
+            • Level 8 reached
+            
+            💬 Message:
+            "Feeling great and staying on track with my health goals!"
+            
+            🚨 Emergency Info:
+            • Conditions: Hypertension, Type 2 Diabetes
+            • Last BP: 128/82 mmHg
+            • Last Glucose: 138 mg/dL
+        `,
+        contacts: {
+            avinash: { name: "Avinash Hugar", phone: "+919325298788" },
+            priya: { name: "Priya Sharma", phone: "+919876543210" },
+            raj: { name: "Raj Patel", phone: "+911234567890" }
+        }
+    },
+    doctor: {
+        title: "Clinical Progress Report",
+        icon: "stethoscope",
+        content: `
+            👤 Patient: Rohan Choure (ID: COMPASS-PT-2024-001)
+            📅 Period: ${new Date().toLocaleDateString()}
+            
+            📊 Vital Signs History:
+            • Blood Pressure: 128/82 mmHg (Avg: 130/85)
+            • Glucose Levels: 138 mg/dL (Avg: 142)
+            • Weight: 77.5kg (Trend: -2.5kg in 30 days)
+            
+            💊 Medication Adherence:
+            • Metformin 500mg: 100% adherence (30/30 doses)
+            • Lisinopril 10mg: 100% adherence (30/30 doses)
+            • Atorvastatin 20mg: 95% adherence (28/30 doses)
+            
+            📈 Trends & Observations:
+            • Consistent improvement in glucose control
+            • Stable blood pressure readings
+            • Good exercise adherence (85% completion rate)
+            
+            🎯 Recommendations for Next Visit:
+            • Continue current medication regimen
+            • Consider reducing Metformin if trend continues
+            • Schedule follow-up in 2 weeks
+            
+            🔐 Security Note:
+            • Report digitally signed: COMPASS-SIG-${Date.now()}
+            • HIPAA compliant transmission
+        `,
+        doctors: {
+            dr_sharma: { name: "Dr. Sharma", specialty: "Cardiology", contact: "+919325298788" },
+            dr_patel: { name: "Dr. Patel", specialty: "Endocrinology", contact: "+919876543210" }
+        }
+    }
+};
+
+// Function to send health report to family
+async function sendFamilyReport(event) {
+  if (isSendingReport) return;
+  
+  isSendingReport = true;
+  const card = event.target.closest('.share-report-card');
+  const originalContent = card.innerHTML;
+  
+  // Show sending state
+  card.innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <i data-lucide="send" class="pulse" style="font-size: 32px; color: var(--accent-1); margin-bottom: 10px;"></i>
+      <div>Sending via WhatsApp...</div>
+    </div>
+  `;
+  
+  try {
+    console.log('📱 Sending family report from current appState...');
+    console.log('Current appState:', appState);
+    
+    // Call the API function from api.js which will use current appState
+    const result = await window.API.sendHealthReport('family', {
+      name: appState.profile.name,
+      phone: appState.profile.emergencyContact
+    });
+    
+    if (result.success) {
+      showShareSuccess(result.message || '✅ Family report sent via WhatsApp!');
+      if (window.API.triggerConfetti) {
+        window.API.triggerConfetti();
+      }
+    } else {
+      alert(result.message || '⚠️ Failed to send report. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error sending family report:', error);
+    alert('⚠️ Failed to send report. Please check if the server is running on port 5002.');
+  } finally {
+    isSendingReport = false;
+    card.innerHTML = originalContent;
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+}
+
+// Function to send health report to doctor
+async function sendDoctorReport(event) {
+  if (isSendingReport) return;
+  
+  isSendingReport = true;
+  const card = event.target.closest('.share-report-card');
+  const originalContent = card.innerHTML;
+  
+  // Show sending state
+  card.innerHTML = `
+    <div style="text-align: center; padding: 20px;">
+      <i data-lucide="send" class="pulse" style="font-size: 32px; color: var(--accent-1); margin-bottom: 10px;"></i>
+      <div>Sending clinical report via WhatsApp...</div>
+    </div>
+  `;
+  
+  try {
+    console.log('🏥 Sending doctor report from current appState...');
+    console.log('Current appState:', appState);
+    
+    // Call the API function from api.js which will use current appState
+    const result = await window.API.sendHealthReport('doctor', {
+      name: 'Dr. Sharma',
+      phone: appState.profile.emergencyContact,
+      specialty: 'Cardiology'
+    });
+    
+    if (result.success) {
+      showShareSuccess(result.message || '✅ Clinical report sent to doctor via WhatsApp!');
+      if (window.API.triggerConfetti) {
+        window.API.triggerConfetti();
+      }
+    } else {
+      alert(result.message || '⚠️ Failed to send report. Please try again.');
+    }
+  } catch (error) {
+    console.error('Error sending doctor report:', error);
+    alert('⚠️ Failed to send report. Please check if the server is running on port 5002.');
+  } finally {
+    isSendingReport = false;
+    card.innerHTML = originalContent;
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+}
+
+// Helper functions (make sure these exist)
+function showSharingLoading(type) {
+    // You can implement a loading spinner
+    console.log(`Sending ${type} report...`);
+}
+
+function showShareSuccess(message) {
+    alert(message);
+}
+
+// Family member and doctor selection functions (keep these as they are)
+function selectFamilyMember(element, memberId) {
+    document.querySelectorAll('.family-member-option').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedFamilyMember = memberId;
+}
+
+function selectDoctor(element, doctorId) {
+    document.querySelectorAll('.doctor-option').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    selectedDoctor = doctorId;
+}
+
+function addNewFamilyMember() {
+    const name = prompt("Enter family member's name:");
+    const phone = prompt("Enter phone number (with country code):");
+    if (name && phone) {
+        alert(`Family member ${name} added successfully!`);
+    }
+}
+
+function addNewDoctor() {
+    const name = prompt("Enter doctor's name:");
+    const specialty = prompt("Enter specialty:");
+    const contact = prompt("Enter contact number/email:");
+    if (name && specialty && contact) {
+        alert(`Dr. ${name} added successfully!`);
+    }
+}
+
+    // Initialize share functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize form fields from appState
+        initializeFormFields();
+
+        // Add click effects to share cards
+        document.querySelectorAll('.share-report-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.family-member-option') && !e.target.closest('.doctor-option')) {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+    });
+    // ===== SHARING SUCCESS FUNCTION =====
+function showShareSuccess(message) {
+    // Create a notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10B981, #34D399);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: bold;
+        animation: slideIn 0.3s ease-out;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    `;
+    
+    notification.innerHTML = `
+        <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Refresh Lucide icons
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Add this function for social sharing (optional but good to have)
+function shareOnFacebook() {
+    const text = document.getElementById('shareMessage')?.value || 'Check out my health journey progress!';
+    const url = 'https://compass-health.example.com';
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareOnTwitter() {
+    const text = document.getElementById('shareMessage')?.value || 'Check out my health journey progress!';
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareOnInstagram() {
+    alert('To share on Instagram, save the image and post it from your Instagram app!');
+}
+
+function shareOnLinkedIn() {
+    const text = document.getElementById('shareMessage')?.value || 'Check out my health journey progress!';
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://compass-health.example.com')}`, '_blank');
+}
+
+function generateShareImage() {
+    alert('Share image generation would create a custom image with your health stats!');
+    // You can implement this with html2canvas library
+}
+// ===================
+        // CONNECTION SETTINGS
+        // ===================
+
+        // Connection data structure
+        let connectionData = {
+            doctors: [
+                {
+                    id: 1,
+                    name: "Dr. Sharma",
+                    specialty: "Cardiology",
+                    phone: "(555) 123-4567",
+                    email: "sharma@hospital.com",
+                    hospital: "City General Hospital",
+                    notes: "Primary cardiologist, meets every 2 weeks",
+                    isPrimary: true
+                },
+                {
+                    id: 2,
+                    name: "Dr. Patel",
+                    specialty: "Endocrinology",
+                    phone: "(555) 987-6543",
+                    email: "patel@diabetesclinic.com",
+                    hospital: "Diabetes Care Center",
+                    notes: "Diabetes specialist, next appointment in 1 month",
+                    isPrimary: false
+                }
+            ],
+            
+            familyMembers: [
+                {
+                    id: 1,
+                    name: "Avinash Hugar",
+                    relationship: "Son",
+                    phone: "(555) 123-4567",
+                    email: "avinash@example.com",
+                    isEmergencyContact: true,
+                    canReceiveReports: true,
+                    notes: "Primary emergency contact"
+                },
+                {
+                    id: 2,
+                    name: "Priya Sharma",
+                    relationship: "Daughter",
+                    phone: "(555) 987-6543",
+                    email: "priya@example.com",
+                    isEmergencyContact: true,
+                    canReceiveReports: true,
+                    notes: "Lives nearby"
+                },
+                {
+                    id: 3,
+                    name: "Raj Patel",
+                    relationship: "Brother",
+                    phone: "(555) 456-7890",
+                    email: "raj@example.com",
+                    isEmergencyContact: false,
+                    canReceiveReports: true,
+                    notes: "Contact in case of emergency"
+                }
+            ],
+            
+            healthDevices: [
+                {
+                    id: 1,
+                    name: "Apple Watch Series 8",
+                    type: "smartwatch",
+                    brand: "Apple",
+                    lastSync: new Date().toLocaleString(),
+                    status: "connected",
+                    metrics: ["heart_rate", "ecg", "blood_oxygen", "activity"],
+                    battery: "85%"
+                },
+                {
+                    id: 2,
+                    name: "Omron Blood Pressure Monitor",
+                    type: "bp_monitor",
+                    brand: "Omron",
+                    lastSync: new Date().toLocaleString(),
+                    status: "connected",
+                    metrics: ["blood_pressure"],
+                    battery: "100%"
+                },
+                {
+                    id: 3,
+                    name: "Accu-Chek Glucose Meter",
+                    type: "glucometer",
+                    brand: "Accu-Chek",
+                    lastSync: new Date().toLocaleString(),
+                    status: "disconnected",
+                    metrics: ["blood_glucose"],
+                    battery: "60%"
+                }
+            ]
+        };
+
+        // Initialize connection settings
+        function initConnectionSettings() {
+            loadConnectionData();
+            updateConnectionCounts();
+        }
+
+        // Load from localStorage
+        function loadConnectionData() {
+            try {
+                const saved = localStorage.getItem('compass_connections');
+                if (saved) {
+                    connectionData = JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('Error loading connection data:', error);
+            }
+        }
+
+        // Save to localStorage
+        function saveConnectionData() {
+            try {
+                localStorage.setItem('compass_connections', JSON.stringify(connectionData));
+                updateConnectionCounts();
+            } catch (error) {
+                console.error('Error saving connection data:', error);
+            }
+        }
+
+        // Update counts display
+        function updateConnectionCounts() {
+            if (document.getElementById('doctorsCount')) {
+                document.getElementById('doctorsCount').textContent = 
+                    `${connectionData.doctors.length} doctor${connectionData.doctors.length !== 1 ? 's' : ''}`;
+            }
+            
+            if (document.getElementById('familyCount')) {
+                document.getElementById('familyCount').textContent = 
+                    `${connectionData.familyMembers.length} family member${connectionData.familyMembers.length !== 1 ? 's' : ''}`;
+            }
+            
+            if (document.getElementById('devicesCount')) {
+                const connectedDevices = connectionData.healthDevices.filter(d => d.status === 'connected').length;
+                document.getElementById('devicesCount').textContent = 
+                    `${connectedDevices} device${connectedDevices !== 1 ? 's' : ''} connected`;
+            }
+        }
+
+        // Show Doctors Modal
+        function showDoctorsModal() {
+            const modalHTML = `
+                <div class="connection-modal" id="doctorsModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="stethoscope" style="color: #10B981;"></i>
+                                <span>Healthcare Providers</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('doctorsModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="connection-list" id="doctorsList">
+                            ${connectionData.doctors.map(doctor => `
+                                <div class="connection-item" data-id="${doctor.id}">
+                                    <div class="connection-item-header">
+                                        <div class="connection-item-name">
+                                            ${doctor.name}
+                                            ${doctor.isPrimary ? '<span class="connection-badge">Primary</span>' : ''}
+                                        </div>
+                                        <div class="connection-item-actions">
+                                            <button class="connection-item-action" onclick="openEditDoctorForm(${doctor.id})" title="Edit">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="connection-item-action" onclick="deleteDoctor(${doctor.id})" title="Delete">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="connection-item-details">
+                                        <div><strong>Specialty:</strong> ${doctor.specialty}</div>
+                                        <div><strong>Phone:</strong> ${doctor.phone}</div>
+                                        <div><strong>Email:</strong> ${doctor.email}</div>
+                                        ${doctor.hospital ? `<div><strong>Hospital:</strong> ${doctor.hospital}</div>` : ''}
+                                        ${doctor.notes ? `<div><strong>Notes:</strong> ${doctor.notes}</div>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            ${connectionData.doctors.length === 0 ? `
+                                <div class="empty-state">
+                                    <i data-lucide="user-x"></i>
+                                    <div style="font-weight: bold; margin-bottom: 10px;">No doctors added</div>
+                                    <div>Add your healthcare providers to share reports and receive care</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('doctorsModal')">
+                                <i data-lucide="x"></i> Close
+                            </button>
+                            <button class="action-button primary" onclick="openAddDoctorForm()">
+                                <i data-lucide="plus"></i> Add New Doctor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('doctorsModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            document.getElementById('doctorsModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Show Family Modal
+        function showFamilyModal() {
+            const modalHTML = `
+                <div class="connection-modal" id="familyModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="heart" style="color: #3B82F6;"></i>
+                                <span>Family & Emergency Contacts</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('familyModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="connection-list" id="familyList">
+                            ${connectionData.familyMembers.map(member => `
+                                <div class="connection-item" data-id="${member.id}">
+                                    <div class="connection-item-header">
+                                        <div class="connection-item-name">
+                                            ${member.name}
+                                            ${member.isEmergencyContact ? '<span class="connection-badge">Emergency</span>' : ''}
+                                            ${member.canReceiveReports ? '<span class="connection-badge">Receives Reports</span>' : ''}
+                                        </div>
+                                        <div class="connection-item-actions">
+                                            <button class="connection-item-action" onclick="openEditFamilyForm(${member.id})" title="Edit">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="connection-item-action" onclick="deleteFamilyMember(${member.id})" title="Delete">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="connection-item-details">
+                                        <div><strong>Relationship:</strong> ${member.relationship}</div>
+                                        <div><strong>Phone:</strong> ${member.phone}</div>
+                                        ${member.email ? `<div><strong>Email:</strong> ${member.email}</div>` : ''}
+                                        ${member.notes ? `<div><strong>Notes:</strong> ${member.notes}</div>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            ${connectionData.familyMembers.length === 0 ? `
+                                <div class="empty-state">
+                                    <i data-lucide="users"></i>
+                                    <div style="font-weight: bold; margin-bottom: 10px;">No family members added</div>
+                                    <div>Add family members to share health updates and emergency contacts</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('familyModal')">
+                                <i data-lucide="x"></i> Close
+                            </button>
+                            <button class="action-button primary" onclick="openAddFamilyForm()">
+                                <i data-lucide="plus"></i> Add Family Member
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('familyModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            document.getElementById('familyModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Show Devices Modal
+        function showDevicesModal() {
+            const modalHTML = `
+                <div class="connection-modal" id="devicesModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="watch" style="color: #8B5CF6;"></i>
+                                <span>Connected Health Devices</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('devicesModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="connection-list" id="devicesList">
+                            ${connectionData.healthDevices.map(device => `
+                                <div class="connection-item" data-id="${device.id}">
+                                    <div class="connection-item-header">
+                                        <div class="connection-item-name">
+                                            ${device.name}
+                                            <span class="device-status status-${device.status}">
+                                                ${device.status.charAt(0).toUpperCase() + device.status.slice(1)}
+                                            </span>
+                                        </div>
+                                        <div class="connection-item-actions">
+                                            <button class="connection-item-action" onclick="syncDevice(${device.id})" title="Sync Now">
+                                                <i data-lucide="refresh-cw"></i>
+                                            </button>
+                                            <button class="connection-item-action" onclick="openEditDeviceForm(${device.id})" title="Edit">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="connection-item-action" onclick="disconnectDevice(${device.id})" title="Disconnect">
+                                                <i data-lucide="unlink"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="connection-item-details">
+                                        <div><strong>Type:</strong> ${device.type.replace('_', ' ').toUpperCase()}</div>
+                                        <div><strong>Brand:</strong> ${device.brand}</div>
+                                        <div><strong>Last Sync:</strong> ${device.lastSync}</div>
+                                        <div><strong>Battery:</strong> ${device.battery}</div>
+                                        <div><strong>Metrics:</strong> 
+                                            ${device.metrics.map(metric => 
+                                                `<span class="connection-badge">${metric.replace('_', ' ')}</span>`
+                                            ).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            ${connectionData.healthDevices.length === 0 ? `
+                                <div class="empty-state">
+                                    <i data-lucide="bluetooth"></i>
+                                    <div style="font-weight: bold; margin-bottom: 10px;">No devices connected</div>
+                                    <div>Connect health devices to automatically sync your health data</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="scanForDevices()">
+                                <i data-lucide="search"></i> Scan for Devices
+                            </button>
+                            <button class="action-button primary" onclick="openAddDeviceForm()">
+                                <i data-lucide="plus"></i> Add Device Manually
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('devicesModal');
+            if (existingModal) existingModal.remove();
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            document.getElementById('devicesModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Close connection modal
+        function closeConnectionModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // ===================
+        // FAMILY MEMBER FUNCTIONS
+        // ===================
+
+        // Open Add Family Form
+        function openAddFamilyForm() {
+            const formHTML = `
+                <div class="connection-modal" id="addFamilyModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="user-plus"></i>
+                                <span>Add Family Member</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('addFamilyModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="connection-form">
+                            <div class="form-group">
+                                <label for="newFamilyName">Name *</label>
+                                <input type="text" id="newFamilyName" placeholder="John Smith" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newFamilyRelationship">Relationship</label>
+                                <select id="newFamilyRelationship">
+                                    <option value="">Select relationship</option>
+                                    <option value="Spouse">Spouse</option>
+                                    <option value="Son">Son</option>
+                                    <option value="Daughter">Daughter</option>
+                                    <option value="Brother">Brother</option>
+                                    <option value="Sister">Sister</option>
+                                    <option value="Parent">Parent</option>
+                                    <option value="Friend">Friend</option>
+                                    <option value="Caregiver">Caregiver</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newFamilyPhone">Phone Number *</label>
+                                <input type="tel" id="newFamilyPhone" placeholder="(555) 123-4567" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newFamilyEmail">Email</label>
+                                <input type="email" id="newFamilyEmail" placeholder="email@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newFamilyNotes">Notes</label>
+                                <textarea id="newFamilyNotes" placeholder="Emergency instructions..."></textarea>
+                            </div>
+                            
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="newFamilyEmergency" checked>
+                                    <label for="newFamilyEmergency" style="font-weight: normal; margin: 0;">Emergency contact</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="newFamilyReceiveReports" checked>
+                                    <label for="newFamilyReceiveReports" style="font-weight: normal; margin: 0;">Receive health reports</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('addFamilyModal')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                            <button class="action-button primary" onclick="addFamilyMember()">
+                                <i data-lucide="save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing form modal if any
+            const existingForm = document.getElementById('addFamilyModal');
+            if (existingForm) existingForm.remove();
+            
+            // Add new form
+            document.body.insertAdjacentHTML('beforeend', formHTML);
+            
+            // Show form
+            document.getElementById('addFamilyModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Open Edit Family Form
+        function openEditFamilyForm(id) {
+            const member = connectionData.familyMembers.find(f => f.id === id);
+            if (!member) return;
+            
+            const formHTML = `
+                <div class="connection-modal" id="editFamilyModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="edit-2"></i>
+                                <span>Edit Family Member</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('editFamilyModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="editFamilyId" value="${member.id}">
+                        
+                        <div class="connection-form">
+                            <div class="form-group">
+                                <label for="editFamilyName">Name *</label>
+                                <input type="text" id="editFamilyName" value="${member.name}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editFamilyRelationship">Relationship</label>
+                                <select id="editFamilyRelationship">
+                                    <option value="">Select relationship</option>
+                                    <option value="Spouse" ${member.relationship === 'Spouse' ? 'selected' : ''}>Spouse</option>
+                                    <option value="Son" ${member.relationship === 'Son' ? 'selected' : ''}>Son</option>
+                                    <option value="Daughter" ${member.relationship === 'Daughter' ? 'selected' : ''}>Daughter</option>
+                                    <option value="Brother" ${member.relationship === 'Brother' ? 'selected' : ''}>Brother</option>
+                                    <option value="Sister" ${member.relationship === 'Sister' ? 'selected' : ''}>Sister</option>
+                                    <option value="Parent" ${member.relationship === 'Parent' ? 'selected' : ''}>Parent</option>
+                                    <option value="Friend" ${member.relationship === 'Friend' ? 'selected' : ''}>Friend</option>
+                                    <option value="Caregiver" ${member.relationship === 'Caregiver' ? 'selected' : ''}>Caregiver</option>
+                                    <option value="Other" ${member.relationship === 'Other' ? 'selected' : ''}>Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editFamilyPhone">Phone Number *</label>
+                                <input type="tel" id="editFamilyPhone" value="${member.phone}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editFamilyEmail">Email</label>
+                                <input type="email" id="editFamilyEmail" value="${member.email || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editFamilyNotes">Notes</label>
+                                <textarea id="editFamilyNotes">${member.notes || ''}</textarea>
+                            </div>
+                            
+                            <div class="form-group" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="editFamilyEmergency" ${member.isEmergencyContact ? 'checked' : ''}>
+                                    <label for="editFamilyEmergency" style="font-weight: normal; margin: 0;">Emergency contact</label>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <input type="checkbox" id="editFamilyReceiveReports" ${member.canReceiveReports ? 'checked' : ''}>
+                                    <label for="editFamilyReceiveReports" style="font-weight: normal; margin: 0;">Receive health reports</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('editFamilyModal')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                            <button class="action-button primary" onclick="saveEditedFamilyMember()">
+                                <i data-lucide="save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing form modal if any
+            const existingForm = document.getElementById('editFamilyModal');
+            if (existingForm) existingForm.remove();
+            
+            // Add new form
+            document.body.insertAdjacentHTML('beforeend', formHTML);
+            
+            // Show form
+            document.getElementById('editFamilyModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Add Family Member
+        function addFamilyMember() {
+            const name = document.getElementById('newFamilyName').value.trim();
+            const phone = document.getElementById('newFamilyPhone').value.trim();
+            
+            if (!name || !phone) {
+                alert('Please enter name and phone number');
+                return;
+            }
+            
+            const newMember = {
+                id: Date.now(),
+                name: name,
+                relationship: document.getElementById('newFamilyRelationship').value,
+                phone: phone,
+                email: document.getElementById('newFamilyEmail').value.trim(),
+                notes: document.getElementById('newFamilyNotes').value.trim(),
+                isEmergencyContact: document.getElementById('newFamilyEmergency').checked,
+                canReceiveReports: document.getElementById('newFamilyReceiveReports').checked
+            };
+            
+            connectionData.familyMembers.push(newMember);
+            saveConnectionData();
+            
+            // Close modals and show updated list
+            closeConnectionModal('addFamilyModal');
+            closeConnectionModal('familyModal');
+            
+            // Show success and reload
+            showSuccess('Family member added successfully!');
+            setTimeout(() => showFamilyModal(), 300);
+        }
+
+        // Save Edited Family Member
+        function saveEditedFamilyMember() {
+            const id = parseInt(document.getElementById('editFamilyId').value);
+            const member = connectionData.familyMembers.find(f => f.id === id);
+            
+            if (!member) {
+                alert('Member not found');
+                return;
+            }
+            
+            const name = document.getElementById('editFamilyName').value.trim();
+            const phone = document.getElementById('editFamilyPhone').value.trim();
+            
+            if (!name || !phone) {
+                alert('Please enter name and phone number');
+                return;
+            }
+            
+            // Update member data
+            member.name = name;
+            member.relationship = document.getElementById('editFamilyRelationship').value;
+            member.phone = phone;
+            member.email = document.getElementById('editFamilyEmail').value.trim();
+            member.notes = document.getElementById('editFamilyNotes').value.trim();
+            member.isEmergencyContact = document.getElementById('editFamilyEmergency').checked;
+            member.canReceiveReports = document.getElementById('editFamilyReceiveReports').checked;
+            
+            saveConnectionData();
+            
+            // Close modals and show updated list
+            closeConnectionModal('editFamilyModal');
+            closeConnectionModal('familyModal');
+            
+            // Show success and reload
+            showSuccess('Family member updated successfully!');
+            setTimeout(() => showFamilyModal(), 300);
+        }
+
+        // Delete Family Member
+        function deleteFamilyMember(id) {
+            if (confirm('Are you sure you want to delete this family member?')) {
+                connectionData.familyMembers = connectionData.familyMembers.filter(f => f.id !== id);
+                saveConnectionData();
+                
+                // Show updated list
+                closeConnectionModal('familyModal');
+                showSuccess('Family member deleted!');
+                setTimeout(() => showFamilyModal(), 300);
+            }
+        }
+
+        // ===================
+        // DOCTOR FUNCTIONS
+        // ===================
+
+        // Open Add Doctor Form
+        function openAddDoctorForm() {
+            const formHTML = `
+                <div class="connection-modal" id="addDoctorModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="user-plus"></i>
+                                <span>Add New Doctor</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('addDoctorModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="connection-form">
+                            <div class="form-group">
+                                <label for="newDoctorName">Doctor Name *</label>
+                                <input type="text" id="newDoctorName" placeholder="Dr. John Smith" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDoctorSpecialty">Specialty</label>
+                                <input type="text" id="newDoctorSpecialty" placeholder="Cardiology, Endocrinology, etc.">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDoctorPhone">Phone Number</label>
+                                <input type="tel" id="newDoctorPhone" placeholder="(555) 123-4567">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDoctorEmail">Email</label>
+                                <input type="email" id="newDoctorEmail" placeholder="doctor@hospital.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDoctorHospital">Hospital/Clinic</label>
+                                <input type="text" id="newDoctorHospital" placeholder="City General Hospital">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDoctorNotes">Notes</label>
+                                <textarea id="newDoctorNotes" placeholder="Appointment schedule, special instructions..."></textarea>
+                            </div>
+                            
+                            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="newDoctorPrimary">
+                                <label for="newDoctorPrimary" style="font-weight: normal; margin: 0;">Set as primary doctor</label>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('addDoctorModal')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                            <button class="action-button primary" onclick="addDoctor()">
+                                <i data-lucide="save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingForm = document.getElementById('addDoctorModal');
+            if (existingForm) existingForm.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', formHTML);
+            document.getElementById('addDoctorModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Open Edit Doctor Form
+        function openEditDoctorForm(id) {
+            const doctor = connectionData.doctors.find(d => d.id === id);
+            if (!doctor) return;
+            
+            const formHTML = `
+                <div class="connection-modal" id="editDoctorModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="edit-2"></i>
+                                <span>Edit Doctor</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('editDoctorModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="editDoctorId" value="${doctor.id}">
+                        
+                        <div class="connection-form">
+                            <div class="form-group">
+                                <label for="editDoctorName">Doctor Name *</label>
+                                <input type="text" id="editDoctorName" value="${doctor.name}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDoctorSpecialty">Specialty</label>
+                                <input type="text" id="editDoctorSpecialty" value="${doctor.specialty || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDoctorPhone">Phone Number</label>
+                                <input type="tel" id="editDoctorPhone" value="${doctor.phone || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDoctorEmail">Email</label>
+                                <input type="email" id="editDoctorEmail" value="${doctor.email || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDoctorHospital">Hospital/Clinic</label>
+                                <input type="text" id="editDoctorHospital" value="${doctor.hospital || ''}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDoctorNotes">Notes</label>
+                                <textarea id="editDoctorNotes">${doctor.notes || ''}</textarea>
+                            </div>
+                            
+                            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="editDoctorPrimary" ${doctor.isPrimary ? 'checked' : ''}>
+                                <label for="editDoctorPrimary" style="font-weight: normal; margin: 0;">Set as primary doctor</label>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('editDoctorModal')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                            <button class="action-button primary" onclick="saveEditedDoctor()">
+                                <i data-lucide="save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingForm = document.getElementById('editDoctorModal');
+            if (existingForm) existingForm.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', formHTML);
+            document.getElementById('editDoctorModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Add Doctor
+        function addDoctor() {
+            const name = document.getElementById('newDoctorName').value.trim();
+            if (!name) {
+                alert('Please enter doctor name');
+                return;
+            }
+            
+            const newDoctor = {
+                id: Date.now(),
+                name: name,
+                specialty: document.getElementById('newDoctorSpecialty').value.trim(),
+                phone: document.getElementById('newDoctorPhone').value.trim(),
+                email: document.getElementById('newDoctorEmail').value.trim(),
+                hospital: document.getElementById('newDoctorHospital').value.trim(),
+                notes: document.getElementById('newDoctorNotes').value.trim(),
+                isPrimary: document.getElementById('newDoctorPrimary').checked
+            };
+            
+            // If setting as primary, unset others
+            if (newDoctor.isPrimary) {
+                connectionData.doctors.forEach(d => d.isPrimary = false);
+            }
+            
+            connectionData.doctors.push(newDoctor);
+            saveConnectionData();
+            
+            closeConnectionModal('addDoctorModal');
+            closeConnectionModal('doctorsModal');
+            
+            showSuccess('Doctor added successfully!');
+            setTimeout(() => showDoctorsModal(), 300);
+        }
+
+        // Save Edited Doctor
+        function saveEditedDoctor() {
+            const id = parseInt(document.getElementById('editDoctorId').value);
+            const doctor = connectionData.doctors.find(d => d.id === id);
+            
+            if (!doctor) {
+                alert('Doctor not found');
+                return;
+            }
+            
+            const name = document.getElementById('editDoctorName').value.trim();
+            if (!name) {
+                alert('Please enter doctor name');
+                return;
+            }
+            
+            doctor.name = name;
+            doctor.specialty = document.getElementById('editDoctorSpecialty').value.trim();
+            doctor.phone = document.getElementById('editDoctorPhone').value.trim();
+            doctor.email = document.getElementById('editDoctorEmail').value.trim();
+            doctor.hospital = document.getElementById('editDoctorHospital').value.trim();
+            doctor.notes = document.getElementById('editDoctorNotes').value.trim();
+            doctor.isPrimary = document.getElementById('editDoctorPrimary').checked;
+            
+            // If setting as primary, unset others
+            if (doctor.isPrimary) {
+                connectionData.doctors.forEach(d => {
+                    if (d.id !== id) d.isPrimary = false;
+                });
+            }
+            
+            saveConnectionData();
+            
+            closeConnectionModal('editDoctorModal');
+            closeConnectionModal('doctorsModal');
+            
+            showSuccess('Doctor updated successfully!');
+            setTimeout(() => showDoctorsModal(), 300);
+        }
+
+        // Delete Doctor
+        function deleteDoctor(id) {
+            if (confirm('Are you sure you want to delete this doctor?')) {
+                connectionData.doctors = connectionData.doctors.filter(d => d.id !== id);
+                saveConnectionData();
+                
+                closeConnectionModal('doctorsModal');
+                showSuccess('Doctor deleted!');
+                setTimeout(() => showDoctorsModal(), 300);
+            }
+        }
+
+        // ===================
+        // DEVICE FUNCTIONS
+        // ===================
+
+        // Open Add Device Form
+        function openAddDeviceForm() {
+            const formHTML = `
+                <div class="connection-modal" id="addDeviceModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="plus"></i>
+                                <span>Add New Device</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('addDeviceModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="connection-form">
+                            <div class="form-group">
+                                <label for="newDeviceName">Device Name *</label>
+                                <input type="text" id="newDeviceName" placeholder="Apple Watch Series 8" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDeviceType">Device Type</label>
+                                <select id="newDeviceType">
+                                    <option value="smartwatch">Smartwatch/Fitness Tracker</option>
+                                    <option value="bp_monitor">Blood Pressure Monitor</option>
+                                    <option value="glucometer">Glucose Meter</option>
+                                    <option value="cgm">Continuous Glucose Monitor</option>
+                                    <option value="scale">Smart Scale</option>
+                                    <option value="thermometer">Thermometer</option>
+                                    <option value="ecg">ECG Monitor</option>
+                                    <option value="spirometer">Spirometer</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDeviceBrand">Brand</label>
+                                <input type="text" id="newDeviceBrand" placeholder="Apple, Fitbit, Omron, etc.">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newDeviceConnection">Connection Type</label>
+                                <select id="newDeviceConnection">
+                                    <option value="bluetooth">Bluetooth</option>
+                                    <option value="wifi">Wi-Fi</option>
+                                    <option value="manual">Manual Entry</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('addDeviceModal')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                            <button class="action-button primary" onclick="addDevice()">
+                                <i data-lucide="save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingForm = document.getElementById('addDeviceModal');
+            if (existingForm) existingForm.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', formHTML);
+            document.getElementById('addDeviceModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Open Edit Device Form
+        function openEditDeviceForm(id) {
+            const device = connectionData.healthDevices.find(d => d.id === id);
+            if (!device) return;
+            
+            const formHTML = `
+                <div class="connection-modal" id="editDeviceModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="edit-2"></i>
+                                <span>Edit Device</span>
+                            </div>
+                            <button class="connection-modal-close" onclick="closeConnectionModal('editDeviceModal')">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                        
+                        <input type="hidden" id="editDeviceId" value="${device.id}">
+                        
+                        <div class="connection-form">
+                            <div class="form-group">
+                                <label for="editDeviceName">Device Name *</label>
+                                <input type="text" id="editDeviceName" value="${device.name}" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDeviceType">Device Type</label>
+                                <select id="editDeviceType">
+                                    <option value="smartwatch" ${device.type === 'smartwatch' ? 'selected' : ''}>Smartwatch/Fitness Tracker</option>
+                                    <option value="bp_monitor" ${device.type === 'bp_monitor' ? 'selected' : ''}>Blood Pressure Monitor</option>
+                                    <option value="glucometer" ${device.type === 'glucometer' ? 'selected' : ''}>Glucose Meter</option>
+                                    <option value="cgm" ${device.type === 'cgm' ? 'selected' : ''}>Continuous Glucose Monitor</option>
+                                    <option value="scale" ${device.type === 'scale' ? 'selected' : ''}>Smart Scale</option>
+                                    <option value="thermometer" ${device.type === 'thermometer' ? 'selected' : ''}>Thermometer</option>
+                                    <option value="ecg" ${device.type === 'ecg' ? 'selected' : ''}>ECG Monitor</option>
+                                    <option value="spirometer" ${device.type === 'spirometer' ? 'selected' : ''}>Spirometer</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDeviceBrand">Brand</label>
+                                <input type="text" id="editDeviceBrand" value="${device.brand}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editDeviceStatus">Status</label>
+                                <select id="editDeviceStatus">
+                                    <option value="connected" ${device.status === 'connected' ? 'selected' : ''}>Connected</option>
+                                    <option value="disconnected" ${device.status === 'disconnected' ? 'selected' : ''}>Disconnected</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="action-button secondary" onclick="closeConnectionModal('editDeviceModal')">
+                                <i data-lucide="x"></i> Cancel
+                            </button>
+                            <button class="action-button primary" onclick="saveEditedDevice()">
+                                <i data-lucide="save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingForm = document.getElementById('editDeviceModal');
+            if (existingForm) existingForm.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', formHTML);
+            document.getElementById('editDeviceModal').style.display = 'flex';
+            
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        }
+
+        // Add Device
+        function addDevice() {
+            const name = document.getElementById('newDeviceName').value.trim();
+            if (!name) {
+                alert('Please enter device name');
+                return;
+            }
+            
+            const newDevice = {
+                id: Date.now(),
+                name: name,
+                type: document.getElementById('newDeviceType').value,
+                brand: document.getElementById('newDeviceBrand').value.trim(),
+                lastSync: new Date().toLocaleString(),
+                status: "connected",
+                metrics: ["heart_rate", "steps"],
+                battery: "100%",
+                connectionType: document.getElementById('newDeviceConnection').value
+            };
+            
+            connectionData.healthDevices.push(newDevice);
+            saveConnectionData();
+            
+            closeConnectionModal('addDeviceModal');
+            closeConnectionModal('devicesModal');
+            
+            showSuccess('Device added successfully!');
+            setTimeout(() => showDevicesModal(), 300);
+        }
+
+        // Save Edited Device
+        function saveEditedDevice() {
+            const id = parseInt(document.getElementById('editDeviceId').value);
+            const device = connectionData.healthDevices.find(d => d.id === id);
+            
+            if (!device) {
+                alert('Device not found');
+                return;
+            }
+            
+            const name = document.getElementById('editDeviceName').value.trim();
+            if (!name) {
+                alert('Please enter device name');
+                return;
+            }
+            
+            device.name = name;
+            device.type = document.getElementById('editDeviceType').value;
+            device.brand = document.getElementById('editDeviceBrand').value.trim();
+            device.status = document.getElementById('editDeviceStatus').value;
+            
+            saveConnectionData();
+            
+            closeConnectionModal('editDeviceModal');
+            closeConnectionModal('devicesModal');
+            
+            showSuccess('Device updated successfully!');
+            setTimeout(() => showDevicesModal(), 300);
+        }
+
+        // Sync Device
+        function syncDevice(id) {
+            const device = connectionData.healthDevices.find(d => d.id === id);
+            if (!device) return;
+            
+            // Show syncing status
+            const originalStatus = device.status;
+            device.status = 'syncing';
+            saveConnectionData();
+            
+            // Close and reopen modal to show syncing status
+            closeConnectionModal('devicesModal');
+            setTimeout(() => showDevicesModal(), 100);
+            
+            // Simulate sync process
+            setTimeout(() => {
+                device.status = 'connected';
+                device.lastSync = new Date().toLocaleString();
+                device.battery = `${Math.floor(Math.random() * 30) + 70}%`;
+                saveConnectionData();
+                
+                closeConnectionModal('devicesModal');
+                showSuccess(`Data synced from ${device.name}!`);
+                setTimeout(() => showDevicesModal(), 300);
+            }, 1500);
+        }
+
+        // Disconnect Device
+        function disconnectDevice(id) {
+            if (confirm('Are you sure you want to disconnect this device?')) {
+                const device = connectionData.healthDevices.find(d => d.id === id);
+                if (device) {
+                    device.status = 'disconnected';
+                    saveConnectionData();
+                    
+                    closeConnectionModal('devicesModal');
+                    showSuccess('Device disconnected!');
+                    setTimeout(() => showDevicesModal(), 300);
+                }
+            }
+        }
+
+        // Scan for Devices
+        function scanForDevices() {
+            // Show scanning modal
+            const scanningModal = `
+                <div class="connection-modal" id="scanningModal">
+                    <div class="connection-modal-content">
+                        <div class="connection-modal-header">
+                            <div class="connection-modal-title">
+                                <i data-lucide="search" class="syncing"></i>
+                                <span>Scanning for Devices</span>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <i data-lucide="bluetooth" style="font-size: 48px; color: var(--accent-1); margin-bottom: 20px;"></i>
+                            <div style="font-weight: bold; color: var(--fg); margin-bottom: 10px;">Searching for nearby devices...</div>
+                            <div style="color: var(--muted-2); font-size: 14px;">Make sure your devices are in pairing mode</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingScan = document.getElementById('scanningModal');
+            if (existingScan) existingScan.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', scanningModal);
+            document.getElementById('scanningModal').style.display = 'flex';
+            
+            // Simulate scanning
+            setTimeout(() => {
+                closeConnectionModal('scanningModal');
+                closeConnectionModal('devicesModal');
+                
+                // Show found devices
+                const availableDevices = [
+                    { name: "Fitbit Charge 6", type: "smartwatch", brand: "Fitbit" },
+                    { name: "Withings BPM Connect", type: "bp_monitor", brand: "Withings" }
+                ];
+                
+                const devicesModal = `
+                    <div class="connection-modal" id="availableDevicesModal">
+                        <div class="connection-modal-content">
+                            <div class="connection-modal-header">
+                                <div class="connection-modal-title">
+                                    <i data-lucide="bluetooth"></i>
+                                    <span>Available Devices</span>
+                                </div>
+                                <button class="connection-modal-close" onclick="closeConnectionModal('availableDevicesModal'); showDevicesModal();">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="connection-list">
+                                ${availableDevices.map((device, index) => `
+                                    <div class="connection-item">
+                                        <div class="connection-item-header">
+                                            <div class="connection-item-name">${device.name}</div>
+                                            <button class="action-button primary" style="padding: 8px 15px; font-size: 12px;" 
+                                                    onclick="connectScannedDevice(${index})">
+                                                <i data-lucide="link"></i> Connect
+                                            </button>
+                                        </div>
+                                        <div class="connection-item-details">
+                                            <div><strong>Brand:</strong> ${device.brand}</div>
+                                            <div><strong>Type:</strong> ${device.type.replace('_', ' ').toUpperCase()}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="action-button secondary" onclick="closeConnectionModal('availableDevicesModal'); showDevicesModal();">
+                                    <i data-lucide="arrow-left"></i> Back
+                                </button>
+                                <button class="action-button secondary" onclick="scanForDevices()">
+                                    <i data-lucide="refresh-cw"></i> Scan Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', devicesModal);
+                document.getElementById('availableDevicesModal').style.display = 'flex';
+                
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }, 2000);
+        }
+
+        // Connect Scanned Device
+        function connectScannedDevice(index) {
+            // In real app, this would connect via Bluetooth API
+            alert('Device connection would be implemented with Bluetooth API\n\nFor demo, device is added to connected list.');
+            
+            const newDevice = {
+                id: Date.now(),
+                name: "New Connected Device",
+                type: "smartwatch",
+                brand: "Example Brand",
+                lastSync: new Date().toLocaleString(),
+                status: "connected",
+                metrics: ["heart_rate", "steps"],
+                battery: "100%"
+            };
+            
+            connectionData.healthDevices.push(newDevice);
+            saveConnectionData();
+            
+            closeConnectionModal('availableDevicesModal');
+            showSuccess('Device connected successfully!');
+            setTimeout(() => showDevicesModal(), 300);
+        }
+
+        // Show Success Message
+        function showSuccess(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px);
+                background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(34, 197, 94, 0.9));
+                color: white;
+                padding: 15px 25px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                z-index: 3000;
+                transition: transform 0.3s ease;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: bold;
+            `;
+            
+            toast.innerHTML = `<i data-lucide="check-circle"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+                if (window.lucide) lucide.createIcons();
+            }, 10);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    
+</script>
+</body>
+
+</html>
