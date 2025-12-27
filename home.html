@@ -1,393 +1,526 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COMPASS - Health Dashboard & AI Coach</title>
-    <link rel="stylesheet" href="styles.css">
-    
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js" defer></script>
-    <script src="api.js" defer></script>
-    <script src="script.js" defer></script>
+    <title id="page-title">COMPASS - Secure Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+       
+        :root {
+           
+            --color-primary: #8B5CF6;    
+            --color-secondary: #06B6D4;   
+            --color-accent: #F97316;     
+            --color-bg-start: #FAFBFF;    
+            --color-bg-end: #F0F4FF;      
+            --color-text: #1F2937;       
+            --color-muted: #6B7280;      
+            --color-success: #10B981;    
+            --color-danger: #EF4444;      
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
+            min-height: 100vh;
+            overflow: hidden; 
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.8; }
+            52% { transform: translate(20px, 30px) rotate(5deg); opacity: 0.6; }
+            100% { transform: translate(0, 0) rotate(0deg); opacity: 0.8; }
+        }
+
+        @keyframes move {
+            0% { transform: translateY(0); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        @keyframes logo-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary); }
+            50% { box-shadow: 0 0 20px var(--color-primary), 0 0 30px var(--color-primary); }
+            100% { box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary); }
+        }
+
+        @keyframes welcome-fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake-error {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .animated-symbol {
+            position: absolute;
+            color: rgba(139, 92, 246, 0.4); 
+            font-size: 30px;
+            pointer-events: none;
+            animation: move 20s linear infinite, float 10s ease-in-out infinite alternate;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.65); 
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(139, 92, 246, 0.15); 
+            box-shadow: 
+                0 8px 32px rgba(139, 92, 246, 0.08),
+                0 2px 8px rgba(139, 92, 246, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .logo-compass {
+            animation: logo-pulse 3s ease-in-out infinite;
+        }
+
+        .glowing-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .glowing-button {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+            background-size: 200% 200%;
+            transition: all 0.3s;
+            animation: gradientX 14s ease infinite;
+            color: white;
+            font-weight: 800;
+            box-shadow: 
+                0 8px 24px color-mix(in oklab, var(--color-primary) 35%, transparent), 
+                0 6px 18px color-mix(in oklab, var(--color-secondary) 25%, transparent);
+        }
+
+        .glowing-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 32px color-mix(in oklab, var(--color-primary) 45%, transparent), 
+                0 8px 24px color-mix(in oklab, var(--color-secondary) 35%, transparent);
+        }
+
+        @keyframes gradientX {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        #welcome-screen {
+            display: none;
+            background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
+            z-index: 100;
+        }
+
+        #welcome-logo {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .h-transition {
+            transition: all 0.4s ease-in-out, margin 0.3s ease-in-out;
+        }
+
+        .cyber-border {
+            position: relative;
+        }
+        .cyber-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, var(--color-primary), var(--color-secondary), var(--color-accent), var(--color-primary));
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.4; 
+            filter: blur(8px);
+        }
+
+        
+        .neon-title {
+            background: linear-gradient(90deg, 
+                color-mix(in oklab, var(--color-primary) 80%, white 10%), 
+                var(--color-secondary), 
+                color-mix(in oklab, var(--color-accent) 85%, white 5%), 
+                color-mix(in oklab, var(--color-primary) 80%, white 10%)); 
+            background-size: 300% 100%; 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+            animation: shine 6s linear infinite; 
+            text-shadow: 0 0 20px color-mix(in oklab, var(--color-primary) 30%, transparent);
+        }
+
+        @keyframes shine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(139, 92, 246, 0.2) !important;
+        }
+
+        .form-label {
+            color: var(--color-text) !important;
+            font-weight: 500 !important;
+        }
+
+    </style>
 </head>
+<body class="flex items-center justify-center p-4">
 
-<body data-theme="neon">
-    <header class="header">
-        <div class="header-content">
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i data-lucide="compass"></i>
-                </div>
-                <div class="greeting">
-                    <h1>Hello, Rohan! <span class="text-gradient float-animation">👋</span></h1>
-                    <p><i data-lucide="sun"></i> <span id="greeting">Good Morning!</span> • <span id="current-time">08:30 AM</span></p>
-                </div>
-            </div>
+    <!-- Floating Symbols Background -->
+    <div id="symbols-container" class="absolute inset-0 z-0"></div>
 
-            <a href="settings.html" class="header-settings-icon" aria-label="Settings">
-                <i data-lucide="settings"></i>
-            </a>
+    <!-- Welcome Animation Screen -->
+    <div id="welcome-screen" class="fixed inset-0 flex flex-col items-center justify-center">
+        <div id="welcome-logo" class="p-8 rounded-full cyber-border">
+           
+            <img 
+                src="Compass.png" 
+                alt="COMPASS Logo" 
+                class="w-24 h-24 rounded-full shadow-lg logo-compass"
+                onerror="this.onerror=null; this.src='https://placehold.co/96x96/9CA3AF/FFFFFF?text=LOGO+ERR';"
+            />
+        </div>
+        <div class="neon-title text-5xl font-extrabold mt-8" style="animation: welcome-fade-in 1.5s forwards 0.5s;">
+            Access Granted
+        </div>
+        <p class="text-gray-700 mt-4 text-xl" style="animation: welcome-fade-in 1.5s forwards 1s;">
+            Redirecting to your secured dashboard...
+        </p>
+    </div>
 
-            <div class="header-controls">
-                <div class="level-badge">
-                    <i data-lucide="award"></i> Level 5
-                </div>
-                <select id="theme-select" class="btn-secondary">
-                    <option value="neon">Neon</option>
-                    <option value="pastel">Pastel</option>
-                    <option value="contrast">High Contrast</option>
-                </select>
-            </div>
+    <!-- Login/Signup Card -->
+    <div id="login-card" class="glassmorphism p-8 md:p-10 rounded-3xl w-full max-w-md z-10 cyber-border">
+        <div class="text-center mb-8">
+            
+            <img 
+                src="Compass.png" 
+                alt="COMPASS Logo" 
+                class="w-16 h-16 mx-auto rounded-full shadow-md logo-compass"
+                onerror="this.onerror=null; this.src='https://placehold.co/64x64/9CA3AF/FFFFFF?text=LOGO+ERR';"
+            />
+            <h1 class="text-3xl font-extrabold neon-title mt-4">COMPASS</h1>
+            <p class="text-sm text-[--color-primary] opacity-80 font-semibold">Find Your Way to Wellness...</p>
         </div>
 
-        <div class="vitals-display">
-            <div class="vital-item" style="position: relative;">
-                <i data-lucide="heart" style="color: var(--danger)"></i>
-                <span style="font-weight: bold;">72</span> BPM
-                <div class="vital-badge"></div>
+        <form id="auth-form" onsubmit="event.preventDefault(); handleAuth();">
+            <!-- ABHA Number/Username Field -->
+            <div class="mb-4">
+                <label for="abha" class="block text-sm font-medium form-label mb-2">ABHA Number / Username</label>
+                <input type="text" id="abha" placeholder="e.g. 1234-5678-9012-3456" class="glowing-input input-field w-full p-3 rounded-xl text-gray-800 border transition duration-300">
             </div>
-            <div class="vital-item">
-                <i data-lucide="thermometer" style="color: var(--warn)"></i>
-                <span style="font-weight: bold;">70/80</span> mmHg
-            </div>
-            <div class="vital-item">
-                <i data-lucide="droplet" style="color: var(--accent-1)"></i>
-                <span style="font-weight: bold;">105</span> mg/dL
-            </div>
-            <div class="vital-item">
-                <i data-lucide="wind" style="color: var(--ok)"></i>
-                <span style="font-weight: bold;">97</span> SpO₂
-            </div>
-            <div class="vital-item highlight-vital">
-                <i data-lucide="flame" style="color: #FF6B00"></i>
-                <span style="font-weight: bold; color: #FF6B00;" class="streak-count">7</span> Day Streak
-            </div>
-        </div>
-    </header>
 
-    <main class="main-content">
-        <div class="card" style="margin-bottom: 30px;">
-            <div class="card-content" style="padding: 30px;">
-                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    <i data-lucide="gauge-circle" style="color: var(--accent-1)"></i>
-                    Today's Compliance Score
-                </h2>
-                <div class="progress-container" style="margin-bottom: 15px;">
-                    <div class="progress-bar" style="width: 85%"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 48px; font-weight: 900;" class="text-gradient">85%</span>
-                    <div class="xp-badge">
-                        <i data-lucide="star"></i> +15 XP Today
-                    </div>
-                </div>
+            <!-- Email Field -->
+            <div class="mb-4">
+                <label for="email" class="block text-sm font-medium form-label mb-2">Email</label>
+                <input type="email" id="email" required placeholder="your.identity@compass.med" class="glowing-input input-field w-full p-3 rounded-xl text-gray-800 border transition duration-300">
             </div>
-        </div>
 
-        <div class="card" style="margin-bottom: 30px;">
-            <div class="card-content" style="padding: 30px;">
-                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                    <i data-lucide="activity" style="color: var(--accent-1)"></i>
-                    Real-time Risk Monitoring
-                </h2>
-
-                <div class="risk-grid">
-                    <div style="text-align: center;">
-                        <div style="font-size: 32px; font-weight: 900;" class="risk-score">25</div>
-                        <div style="color: var(--muted-2);">Risk Score</div>
-                        <div style="font-size: 12px; color: var(--ok); margin-top: 5px;">Low Risk</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 32px; font-weight: 900;" class="current-streak">7</div>
-                        <div style="color: var(--muted-2);">Day Streak</div>
-                        <div style="font-size: 12px; color: var(--warn); margin-top: 5px;"><i data-lucide="flame"></i> Keep going!</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 32px; font-weight: 900;" class="shield-count">1</div>
-                        <div style="color: var(--muted-2);">Safety Shields</div>
-                        <div style="font-size: 12px; color: var(--accent-2); margin-top: 5px;"><i data-lucide="shield"></i> Active</div>
-                    </div>
-                </div>
-
-                <div class="info-box">
-                    <i data-lucide="info" style="margin-right: 8px;"></i>
-                    Your safety shield protects your streak from one missed dose. Earn more by maintaining streaks!
-                </div>
-<button id="nudge-generate-btn" class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="window.location.href='risk-dashboard.html'">
-                    <span id="nudge-btn-text">Risk Dashboard</span>
-                    <div id="nudge-loading" class="spinner hidden"></div>
+            <!-- Password Field -->
+            <div class="mb-4 relative">
+                <label for="password" class="block text-sm font-medium form-label mb-2">Password</label>
+                <input type="password" id="password" required placeholder="••••••••" class="glowing-input input-field w-full p-3 pr-10 rounded-xl text-gray-800 border transition duration-300">
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-500 hover:text-[--color-primary]">
+                    <svg id="toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                 </button>
-            </div>
-        </div>
-
-        <div class="card ai-card" style="margin-bottom: 30px;">
-            <div class="card-content" style="padding: 30px;">
-                <div class="ai-badge">
-                    <i data-lucide="sparkles"></i> AI Personalized Nudge Coach
-                </div>
-                <h2 style="margin-top: 15px; margin-bottom: 10px;">Struggling with adherence?</h2>
-                <p style="color: var(--muted-2); font-size: 14px;">Select a topic below to see specific options.</p>
-
-                <div class="ai-quick-select">
-                    <button class="ai-chip" onclick="showSubOptions('fitness')">💪 Fitness</button>
-                    <button class="ai-chip" onclick="showSubOptions('hydration')">💧 Dehydration</button>
-                    <button class="ai-chip" onclick="showSubOptions('diet')">🥗 Diet & Nutrition</button>
-                    <button class="ai-chip" onclick="setNudgeContext('')">✏️ Manual Type</button>
-                </div>
-
-                <div id="ai-sub-options" class="ai-sub-options hidden">
-                    </div>
-
-                <textarea id="nudge-context" class="ai-input" rows="3" placeholder="Describe your barrier here..."></textarea>
-
-                <div class="ai-controls">
-                    <div class="custom-select-wrapper">
-                        <label>Coach Tone</label>
-                        <select id="nudge-tone" class="ai-select custom-select">
-                            <option value="supportive">🤗 Supportive & Kind</option>
-                            <option value="direct">👨‍⚕️ Direct & Clinical</option>
-                            <option value="gamified">🎮 Gamified & Fun</option>
-                            <option value="tough-love">🔥 Tough Love</option>
-                        </select>
-                    </div>
-                    <div class="custom-select-wrapper">
-                        <label>Strategy</label>
-                        <select id="nudge-logic" class="ai-select custom-select">
-                            <option value="implementation intentions">📝 Action Planning</option>
-                            <option value="anchoring">⚓ Habit Stacking</option>
-                            <option value="loss aversion">🛡️ Streak Protection</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button id="nudge-generate-btn" class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="generateNudge()">
-                    <span id="nudge-btn-text">Generate Nudge Strategy</span>
-                    <div id="nudge-loading" class="spinner hidden"></div>
-                </button>
-
-                <div id="nudge-output" class="ai-output">
-                    <div class="output-header">
-                        <span class="output-title">
-                            <i data-lucide="bot"></i> Coach Plan
-                        </span>
-                        <button onclick="copyNudge()" class="copy-btn">
-                            <i data-lucide="copy" style="width: 14px;"></i> COPY
-                        </button>
-                    </div>
-                    <div id="nudge-text" class="nudge-content-styled"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card eatsence-card" style="margin-bottom: 30px;">
-            <div class="eatsence-badge">
-                <i data-lucide="crown"></i> eatsence.ai Premium
-            </div>
-            <div class="card-content" style="padding: 30px; position: relative; z-index: 1;">
-                <div class="eatsence-header">
-                    <div>
-                        <h2 class="gold-gradient-text" style="font-size: 24px; font-weight: 800; margin-bottom: 5px;">AI Nutrition Tracker</h2>
-                        <p style="color: var(--muted-2); font-size: 13px;">Daily Target: <span style="color: #D4AF37; font-weight: bold;">2200 kcal</span></p>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted-2);">Consumed</span>
-                        <div id="kcal-display-card" class="gold-gradient-text" style="font-size: 28px; font-weight: 900;">0 kcal</div>
-                    </div>
-                </div>
-
-                <div class="macro-grid">
-                    <div class="macro-item">
-                        <span class="macro-label">Protein</span>
-                        <div class="macro-bar"><div id="bar-protein" style="width: 0%; background: #D4AF37;"></div></div>
-                        <span class="macro-val" id="val-protein">0g</span>
-                    </div>
-                    <div class="macro-item">
-                        <span class="macro-label">Carbs</span>
-                        <div class="macro-bar"><div id="bar-carbs" style="width: 0%; background: #F59E0B;"></div></div>
-                        <span class="macro-val" id="val-carbs">0g</span>
-                    </div>
-                    <div class="macro-item">
-                        <span class="macro-label">Fats</span>
-                        <div class="macro-bar"><div id="bar-fat" style="width: 0%; background: #EAB308;"></div></div>
-                        <span class="macro-val" id="val-fat">0g</span>
-                    </div>
-                </div>
-
-                <button onclick="openEatsenceScan()" class="btn-primary gold-btn-effect" style="width: 100%; margin-top: 25px; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    <i data-lucide="camera"></i> AI Scan Food
-                </button>
-                
-                <div style="margin-top: 15px; text-align: center; font-size: 12px; color: var(--muted-2); font-style: italic;">
-                    Powered by Multimodal AI Analysis
-                </div>
-            </div>
-        </div>
-
-        <div class="card" style="margin-bottom: 30px;">
-            <div class="card-content" style="padding: 30px;">
-                <h2 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <span>Recent Activity</span>
-                    <div class="streak-badge">
-                        <i data-lucide="flame"></i> 3 Day Streak
-                    </div>
-                </h2>
-                <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <div class="activity-item ok-bg">
-                        <div class="activity-icon ok">
-                            <i data-lucide="check-circle" style="color: white;"></i>
-                        </div>
-                        <div>
-                            <p style="font-weight: bold;">Morning Medication Taken</p>
-                            <p style="color: var(--muted-2); font-size: 14px;">08:00 AM • +10 XP</p>
-                        </div>
-                    </div>
-                    <div class="activity-item accent-bg">
-                        <div class="activity-icon accent">
-                            <i data-lucide="activity" style="color: white;"></i>
-                        </div>
-                        <div>
-                            <p style="font-weight: bold;">BP Check Completed</p>
-                            <p style="color: var(--muted-2); font-size: 14px;">08:30 AM • +5 XP</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item active">
-            <i data-lucide="home"></i>
-            <span>Home</span>
-        </a>
-        <a href="todo.html" class="nav-item">
-            <i data-lucide="list-checks"></i>
-            <span>To-Do</span>
-        </a>
-        <div class="sos-button" onmousedown="startSOSCountdown()" onmouseup='this.innerHTML = "<i data-lucide=\"siren\"></i>"' ontouchstart="startSOSCountdown()" ontouchend='this.innerHTML = "<i data-lucide=\"siren\"></i>"'>
-            <i data-lucide="siren"></i>
-        </div>
-        <a href="progress.html" class="nav-item">
-            <i data-lucide="trending-up"></i>
-            <span>Progress</span>
-        </a>
-        <a href="gamification.html" class="nav-item">
-            <i data-lucide="gamepad-2"></i>
-            <span>Game</span>
-        </a>
-    </nav>
-
-    <div id="eatsence-scan-modal" class="custom-modal hidden">
-        <div class="custom-modal-content">
-            <div class="modal-header">
-                <h3 class="gold-gradient-text">AI Food Analysis</h3>
-                <button onclick="closeEatsenceModal()" class="close-modal-btn"><i data-lucide="x"></i></button>
             </div>
             
-            <div class="scan-options">
-                <label class="scan-option-btn">
-                    <input type="file" id="eatsence-camera" accept="image/*" capture="environment" hidden>
-                    <i data-lucide="camera" style="width: 32px; height: 32px; margin-bottom: 10px; color: #D4AF37;"></i>
-                    <span>Capture Photo</span>
-                </label>
-                
-                <label class="scan-option-btn">
-                    <input type="file" id="eatsence-upload" accept="image/*" hidden>
-                    <i data-lucide="upload" style="width: 32px; height: 32px; margin-bottom: 10px; color: #F59E0B;"></i>
-                    <span>Upload Image</span>
-                </label>
+            <!-- Confirm Password Field  -->
+            <div id="confirm-password-container" class="h-transition overflow-hidden opacity-0 h-0 mb-0">
+                <div class="mb-6 relative">
+                    <label for="confirm-password" class="block text-sm font-medium form-label mb-2">Confirm Password</label>
+                    <input type="password" id="confirm-password" placeholder="••••••••" class="glowing-input input-field w-full p-3 pr-10 rounded-xl text-gray-800 border transition duration-300">
+                </div>
             </div>
 
-            <div class="divider">OR SELECT MANUAL</div>
+            <!-- Status/Error Message -->
+            <div id="status-message" class="text-center mb-4 font-semibold hidden p-2 border rounded-lg"></div>
 
-            <div class="custom-select-wrapper" style="margin-bottom: 20px;">
-                <select id="manual-food-select" class="ai-select custom-select" style="border-color: #D4AF37;">
-                    <option value="">Select a common food item...</option>
-                    <option value="Raw Gala Apple, large size">Gala Apple</option>
-                    <option value="Medium Ripe Banana">Banana</option>
-                    <option value="Raw Broccoli florets">Broccoli</option>
-                    <option value="Whole Avocado">Avocado</option>
-                    <option value="Sweet Potato, cooked">Sweet Potato</option>
-                    <option value="Raw Chicken Breast, 100g">Chicken Breast (Raw)</option>
-                    <option value="Cooked Brown Rice, 100g">Brown Rice (Cooked)</option>
-                </select>
+            <!-- Forgot Password Link -->
+            <div id="auth-links" class="flex justify-between items-center mb-6">
+                <button type="button" onclick="handlePasswordReset()" class="text-sm text-gray-600 hover:text-[--color-primary] transition duration-300 focus:outline-none">Forgot Password?</button>
             </div>
 
-            <button id="btn-analyze" class="btn-primary gold-btn-effect" style="width: 100%;" onclick="triggerAnalysis()">
-                Run Multimodal Analysis
+            <!-- Submit Button -->
+            <button type="submit" id="auth-button" class="glowing-button w-full text-white p-3 rounded-xl font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition duration-300">
+                Access COMPASS
             </button>
-            
-            <div id="eatsence-loading" class="spinner-container hidden">
-                <div class="spinner" style="border-top-color: #D4AF37;"></div>
-                <p>AI Identifying...</p>
-            </div>
+        </form>
+        
+        <!-- Mode Toggle Link -->
+        <div class="text-center mt-6">
+             <button type="button" id="toggle-mode-link" onclick="toggleAuthMode()" class="text-sm text-[--color-primary] hover:text-[--color-accent] font-medium transition duration-300">
+                Need an account? Sign Up
+            </button>
         </div>
     </div>
 
-    <div id="eatsence-result-modal" class="custom-modal hidden">
-        <div class="custom-modal-content">
-            <div class="modal-header">
-                <h3 id="res-food-name" class="gold-gradient-text">Food Name</h3>
-                <button onclick="closeEatsenceResult()" class="close-modal-btn"><i data-lucide="x"></i></button>
-            </div>
+    <!-- Firebase SDKs and Logic -->
+    <script type="module">
+        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            sendPasswordResetEmail
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        //  AUTH STATE FLAG 
+        let appMode = 'login'; // 'login' or 'signup'
+
+        // GLOBAL FIREBASE CONFIGURATION (Direct Keys) 
+        const firebaseConfig = {
+            apiKey: "AIzaSyChN0ZW9-Ut013DO2skZjg3eudSx_RSboE", 
+            authDomain: "compass-pd.firebaseapp.com",
+            projectId: "compass-pd", 
+            storageBucket: "compass-pd.firebasestorage.app", 
+            messagingSenderId: "492535344571", 
+            appId: "1:492535344571:web:51967333a12b984a91689e",
+            measurementId: "G-YG21J97H1Z"
+        };
+        
+        let app, auth;
+
+        try {
+            setLogLevel('Debug');
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            console.log("Firebase initialized. Current mode: Login.");
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+        }
+
+        // UI UTILITIES 
+
+        function showAuthError(message, isCritical = true) {
+            const statusElement = document.getElementById('status-message');
+            const loginCard = document.getElementById('login-card');
             
-            <div class="result-details">
-                <div class="confidence-badge">AI Confidence: <span id="res-confidence">98</span>%</div>
+            // Apply RPM theme error styling
+            statusElement.classList.remove('text-indigo-600', 'border-indigo-300', 'bg-indigo-50');
+            statusElement.classList.add('text-red-600', 'border-red-300', 'bg-red-50');
+
+            statusElement.textContent = message;
+            statusElement.classList.remove('hidden');
+            
+            if (isCritical) {
+                 //shake and visual error state
+                loginCard.style.border = '1px solid #F87171';
+                loginCard.style.boxShadow = '0 0 25px rgba(239, 68, 68, 0.5)';
+                loginCard.style.animation = 'shake-error 0.5s ease-in-out';
                 
-                <div class="macro-summary-grid">
-                    <div class="summary-box">
-                        <span class="lbl">Calories</span>
-                        <span class="val" id="res-kcal">0</span>
-                    </div>
-                    <div class="summary-box">
-                        <span class="lbl">Protein</span>
-                        <span class="val" id="res-protein">0g</span>
-                    </div>
-                    <div class="summary-box">
-                        <span class="lbl">Carbs</span>
-                        <span class="val" id="res-carbs">0g</span>
-                    </div>
-                    <div class="summary-box">
-                        <span class="lbl">Fats</span>
-                        <span class="val" id="res-fat">0g</span>
-                    </div> 
-                </div>
+                setTimeout(() => {
+                    loginCard.style.border = '1px solid rgba(139, 92, 246, 0.15)';
+                    loginCard.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.08), 0 2px 8px rgba(139, 92, 246, 0.03)';
+                    loginCard.style.animation = 'none';
+                }, 1000);
+            }
+        }
+        
+        function updateFormPrompt(message) {
+            const statusElement = document.getElementById('status-message');
+            
+            //  theme styling
+            statusElement.classList.remove('text-red-600', 'border-red-300', 'bg-red-50');
+            statusElement.classList.add('text-[--color-primary]', 'border-[--color-primary]', 'bg-[--color-bg-end]');
+            
+            statusElement.innerHTML = message;
+            statusElement.classList.remove('hidden');
+        }
 
-                <div class="input-group" style="margin-top: 20px;">
-                    <label>Portion Size (grams)</label>
-                    <input type="number" id="res-portion" class="ai-input" value="100">
-                </div>
+        function clearStatusMessage() {
+            document.getElementById('status-message').classList.add('hidden');
+        }
 
-                <div class="pro-tip-box">
-                    <strong>✨ Pro Tip:</strong> <span id="res-tip">Loading tip...</span>
-                </div>
+        function redirectToDashboard() {
+            const loginCard = document.getElementById('login-card');
+            const welcomeScreen = document.getElementById('welcome-screen');
+            document.getElementById('auth-form').classList.add('hidden');
+            loginCard.classList.add('hidden');
+            welcomeScreen.style.display = 'flex';
+            
+            setTimeout(() => {
+                window.location.replace('./home.html');
+            }, 3000);
+        }
 
-                <button onclick="confirmLogFood()" class="btn-primary gold-btn-effect" style="width: 100%; margin-top: 20px;">
-                    Log to Diary
-                </button>
-            </div>
-        </div>
-    </div>
-<script>
-  // Initialize file inputs for eatsence
-  document.addEventListener('DOMContentLoaded', function() {
-    const cameraLabel = document.querySelector('label[for="eatsence-camera"]');
-    const uploadLabel = document.querySelector('label[for="eatsence-upload"]');
-    
-    if (cameraLabel) {
-      cameraLabel.addEventListener('click', function() {
-        document.getElementById('eatsence-camera').click();
-      });
-    }
-    
-    if (uploadLabel) {
-      uploadLabel.addEventListener('click', function() {
-        document.getElementById('eatsence-upload').click();
-      });
-    }
-  });
-</script>
+        // Password visibility toggle
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggle-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+            }
+        }
+        
+        // Toggles between login and signup modes
+        window.toggleAuthMode = function(newMode) {
+            clearStatusMessage();
+            const confirmContainer = document.getElementById('confirm-password-container');
+            const authButton = document.getElementById('auth-button');
+            const toggleLink = document.getElementById('toggle-mode-link');
+            const pageTitle = document.getElementById('page-title');
+
+            if (newMode) {
+                appMode = newMode;
+            } else {
+                appMode = appMode === 'login' ? 'signup' : 'login';
+            }
+
+            if (appMode === 'signup') {
+                // confirm password field
+                confirmContainer.classList.remove('h-0', 'opacity-0', 'mb-0');
+                confirmContainer.classList.add('mb-4');
+                authButton.textContent = "Create Account & Access";
+                toggleLink.textContent = "Already have an account? Log In";
+                pageTitle.textContent = "COMPASS - New Account";
+            } else {
+                // Hide confirm password field
+                confirmContainer.classList.add('h-0', 'opacity-0', 'mb-0');
+                confirmContainer.classList.remove('mb-4');
+                authButton.textContent = "Access COMPASS";
+                toggleLink.textContent = "Need an account? Sign Up";
+                pageTitle.textContent = "COMPASS - Secure Authentication";
+            }
+        }
+
+
+        //  MAIN HANDLERS 
+        
+        // Unified Authentication Handler
+        window.handleAuth = async function() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            clearStatusMessage();
+
+            if (!email || !password) {
+                showAuthError("Please enter both email and password.");
+                return;
+            }
+
+            if (appMode === 'signup') {
+                //  SIGN UP VALIDATION 
+                if (password !== confirmPassword) {
+                    showAuthError("Passwords do not match.");
+                    return;
+                }
+                
+                // SIGN UP LOGIC
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    console.log("Account successfully created!");
+                    redirectToDashboard();
+                } catch (error) {
+                    console.error("Signup Error:", error.code, error.message);
+                    let errorMessage = "Registration failed. Please try a stronger password (min 6 chars) or different email.";
+                    
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = "This account already exists. Switching to Log In mode...";
+                        toggleAuthMode('login'); 
+                    } else if (error.code === 'auth/weak-password') {
+                         errorMessage = "The password must be at least 6 characters long.";
+                    }
+                    showAuthError(errorMessage);
+                }
+
+            } else {
+                //  LOGIN LOGIC 
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    redirectToDashboard();
+
+                } catch (error) {
+                    console.error("Login Error:", error.code, error.message);
+                    
+                    let errorMessage = "Login failed. Please check your credentials.";
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        // Crucial step: User not found, switch to signup mode 
+                        updateFormPrompt(`The account **${email}** was not found. Please click the button below to **Create Account**.`);
+                        toggleAuthMode('signup'); 
+                        return;
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = "Invalid password.";
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = "The email address format is invalid.";
+                    }
+
+                    showAuthError(errorMessage);
+                }
+            }
+        };
+
+        //password reset via email
+        window.handlePasswordReset = async function() {
+            const email = document.getElementById('email').value.trim();
+            clearStatusMessage();
+
+            if (!email) {
+                showAuthError("Please enter your email address above to receive the reset link.", false);
+                return;
+            }
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                updateFormPrompt(`A password reset link has been sent to **${email}**. Please check your inbox.`);
+            } catch (error) {
+                console.error("Password Reset Error:", error.code, error.message);
+                let errorMessage = "Could not send password reset link. Please ensure the email is correct and try again.";
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = "No account found for this email address.";
+                }
+                showAuthError(errorMessage, false);
+            }
+        };
+
+
+        // BACKGROUND GENERATION 
+        document.addEventListener('DOMContentLoaded', () => {
+            const symbolsContainer = document.getElementById('symbols-container');
+            const symbols = [
+                `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M12 20.001v-8M12 20.001v-8"></path></svg>`, // Stethoscope
+                `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 15a1 1 0 01-1-1v-3H8a1 1 0 010-2h3V8a1 1 0 012 0v3h3a1 1 0 010 2h-3v3a1 1 0 01-1 1z"/></svg>`, // Cross
+                `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.18C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, // Heart
+                `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM7 5h10v14H7V5zm2 2h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z"/></svg>` // Capsule
+            ];
+
+            for (let i = 0; i < 40; i++) { 
+                const symbol = document.createElement('div');
+                symbol.className = 'animated-symbol';
+                symbol.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
+                
+                const size = Math.random() * 25 + 25; 
+                symbol.style.fontSize = `${size}px`;
+                symbol.style.left = `${Math.random() * 100}vw`;
+                symbol.style.top = `${Math.random() * 100}vh`;
+                symbol.style.animationDelay = `${Math.random() * 15}s`; 
+                symbol.style.animationDuration = `${Math.random() * 10 + 15}s`; 
+                symbol.style.opacity = `${Math.random() * 0.5 + 0.3}`; 
+                symbol.style.transform = `scale(${Math.random() * 0.7 + 0.5})`;
+
+                symbolsContainer.appendChild(symbol);
+            }
+        });
+
+    </script>
 </body>
 </html>
