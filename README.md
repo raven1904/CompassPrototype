@@ -181,9 +181,9 @@ See the [LICENSE.md](LICENSE.md) file for full details.
 ---
 
 ## 📞 Support Contacts
-- **Technical Support:** [tech-support@compasshealth.com](mailto:tech-support@compasshealth.com)  
-- **Healthcare Partnerships:** [partnerships@compasshealth.com](mailto:partnerships@compasshealth.com)  
-- **General Inquiries:** [info@compasshealth.com](mailto:info@compasshealth.com)  
+- **Technical Support:** [tech-support@compasshealth.com](mailto:comapass.team.official@gmail.com)  
+- **Healthcare Partnerships:** [partnerships@compasshealth.com](mailto:comapass.team.official@gmail.com)  
+- **General Inquiries:** [info@compasshealth.com](mailto:comapass.team.official@gmail.com)  
 
 ---
 
