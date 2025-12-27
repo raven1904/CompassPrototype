@@ -1,526 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">COMPASS - Secure Authentication</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        
-       
-        :root {
-           
-            --color-primary: #8B5CF6;    
-            --color-secondary: #06B6D4;   
-            --color-accent: #F97316;     
-            --color-bg-start: #FAFBFF;    
-            --color-bg-end: #F0F4FF;      
-            --color-text: #1F2937;       
-            --color-muted: #6B7280;      
-            --color-success: #10B981;    
-            --color-danger: #EF4444;      
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
-            min-height: 100vh;
-            overflow: hidden; 
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.8; }
-            52% { transform: translate(20px, 30px) rotate(5deg); opacity: 0.6; }
-            100% { transform: translate(0, 0) rotate(0deg); opacity: 0.8; }
-        }
-
-        @keyframes move {
-            0% { transform: translateY(0); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateY(-100vh); opacity: 0; }
-        }
-
-        @keyframes logo-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary); }
-            50% { box-shadow: 0 0 20px var(--color-primary), 0 0 30px var(--color-primary); }
-            100% { box-shadow: 0 0 5px var(--color-primary), 0 0 10px var(--color-primary); }
-        }
-
-        @keyframes welcome-fade-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes shake-error {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
-        }
-
-        .animated-symbol {
-            position: absolute;
-            color: rgba(139, 92, 246, 0.4); 
-            font-size: 30px;
-            pointer-events: none;
-            animation: move 20s linear infinite, float 10s ease-in-out infinite alternate;
-        }
-
-        .glassmorphism {
-            background: rgba(255, 255, 255, 0.65); 
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(139, 92, 246, 0.15); 
-            box-shadow: 
-                0 8px 32px rgba(139, 92, 246, 0.08),
-                0 2px 8px rgba(139, 92, 246, 0.03),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        .logo-compass {
-            animation: logo-pulse 3s ease-in-out infinite;
-        }
-
-        .glowing-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
-            background: rgba(255, 255, 255, 0.95);
-        }
-        
-        .glowing-button {
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
-            background-size: 200% 200%;
-            transition: all 0.3s;
-            animation: gradientX 14s ease infinite;
-            color: white;
-            font-weight: 800;
-            box-shadow: 
-                0 8px 24px color-mix(in oklab, var(--color-primary) 35%, transparent), 
-                0 6px 18px color-mix(in oklab, var(--color-secondary) 25%, transparent);
-        }
-
-        .glowing-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 12px 32px color-mix(in oklab, var(--color-primary) 45%, transparent), 
-                0 8px 24px color-mix(in oklab, var(--color-secondary) 35%, transparent);
-        }
-
-        @keyframes gradientX {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        #welcome-screen {
-            display: none;
-            background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-end) 100%);
-            z-index: 100;
-        }
-
-        #welcome-logo {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-        
-        .h-transition {
-            transition: all 0.4s ease-in-out, margin 0.3s ease-in-out;
-        }
-
-        .cyber-border {
-            position: relative;
-        }
-        .cyber-border::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(45deg, var(--color-primary), var(--color-secondary), var(--color-accent), var(--color-primary));
-            border-radius: inherit;
-            z-index: -1;
-            opacity: 0.4; 
-            filter: blur(8px);
-        }
-
-        
-        .neon-title {
-            background: linear-gradient(90deg, 
-                color-mix(in oklab, var(--color-primary) 80%, white 10%), 
-                var(--color-secondary), 
-                color-mix(in oklab, var(--color-accent) 85%, white 5%), 
-                color-mix(in oklab, var(--color-primary) 80%, white 10%)); 
-            background-size: 300% 100%; 
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            color: transparent; 
-            animation: shine 6s linear infinite; 
-            text-shadow: 0 0 20px color-mix(in oklab, var(--color-primary) 30%, transparent);
-        }
-
-        @keyframes shine {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .input-field {
-            background: rgba(255, 255, 255, 0.9) !important;
-            border: 1px solid rgba(139, 92, 246, 0.2) !important;
-        }
-
-        .form-label {
-            color: var(--color-text) !important;
-            font-weight: 500 !important;
-        }
-
-    </style>
+    <title>COMPASS - Health Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js" defer></script>
+    <script src="script.js" defer></script>
 </head>
-<body class="flex items-center justify-center p-4">
 
-    <!-- Floating Symbols Background -->
-    <div id="symbols-container" class="absolute inset-0 z-0"></div>
+<style>
 
-    <!-- Welcome Animation Screen -->
-    <div id="welcome-screen" class="fixed inset-0 flex flex-col items-center justify-center">
-        <div id="welcome-logo" class="p-8 rounded-full cyber-border">
-           
-            <img 
-                src="Compass.png" 
-                alt="COMPASS Logo" 
-                class="w-24 h-24 rounded-full shadow-lg logo-compass"
-                onerror="this.onerror=null; this.src='https://placehold.co/96x96/9CA3AF/FFFFFF?text=LOGO+ERR';"
-            />
-        </div>
-        <div class="neon-title text-5xl font-extrabold mt-8" style="animation: welcome-fade-in 1.5s forwards 0.5s;">
-            Access Granted
-        </div>
-        <p class="text-gray-700 mt-4 text-xl" style="animation: welcome-fade-in 1.5s forwards 1s;">
-            Redirecting to your secured dashboard...
-        </p>
-    </div>
+</style>
 
-    <!-- Login/Signup Card -->
-    <div id="login-card" class="glassmorphism p-8 md:p-10 rounded-3xl w-full max-w-md z-10 cyber-border">
-        <div class="text-center mb-8">
-            
-            <img 
-                src="Compass.png" 
-                alt="COMPASS Logo" 
-                class="w-16 h-16 mx-auto rounded-full shadow-md logo-compass"
-                onerror="this.onerror=null; this.src='https://placehold.co/64x64/9CA3AF/FFFFFF?text=LOGO+ERR';"
-            />
-            <h1 class="text-3xl font-extrabold neon-title mt-4">COMPASS</h1>
-            <p class="text-sm text-[--color-primary] opacity-80 font-semibold">Find Your Way to Wellness...</p>
-        </div>
-
-        <form id="auth-form" onsubmit="event.preventDefault(); handleAuth();">
-            <!-- ABHA Number/Username Field -->
-            <div class="mb-4">
-                <label for="abha" class="block text-sm font-medium form-label mb-2">ABHA Number / Username</label>
-                <input type="text" id="abha" placeholder="e.g. 1234-5678-9012-3456" class="glowing-input input-field w-full p-3 rounded-xl text-gray-800 border transition duration-300">
-            </div>
-
-            <!-- Email Field -->
-            <div class="mb-4">
-                <label for="email" class="block text-sm font-medium form-label mb-2">Email</label>
-                <input type="email" id="email" required placeholder="your.identity@compass.med" class="glowing-input input-field w-full p-3 rounded-xl text-gray-800 border transition duration-300">
-            </div>
-
-            <!-- Password Field -->
-            <div class="mb-4 relative">
-                <label for="password" class="block text-sm font-medium form-label mb-2">Password</label>
-                <input type="password" id="password" required placeholder="••••••••" class="glowing-input input-field w-full p-3 pr-10 rounded-xl text-gray-800 border transition duration-300">
-                <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-gray-500 hover:text-[--color-primary]">
-                    <svg id="toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </button>
-            </div>
-            
-            <!-- Confirm Password Field  -->
-            <div id="confirm-password-container" class="h-transition overflow-hidden opacity-0 h-0 mb-0">
-                <div class="mb-6 relative">
-                    <label for="confirm-password" class="block text-sm font-medium form-label mb-2">Confirm Password</label>
-                    <input type="password" id="confirm-password" placeholder="••••••••" class="glowing-input input-field w-full p-3 pr-10 rounded-xl text-gray-800 border transition duration-300">
+<body data-theme="neon">
+    <!-- Header -->
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i data-lucide="compass"></i>
+                </div>
+                <div class="greeting">
+                    <h1>Hello, Rohan! <span class="text-gradient float-animation">👋</span></h1>
+                    <p><i data-lucide="sun"></i> <span id="greeting">Good Morning!</span> • <span
+                            id="current-time">08:30
+                            AM</span></p>
                 </div>
             </div>
 
-            <!-- Status/Error Message -->
-            <div id="status-message" class="text-center mb-4 font-semibold hidden p-2 border rounded-lg"></div>
+            <!-- Settings Icon -->
+            <a href="settings.html" class="header-settings-icon" aria-label="Settings">
+                <i data-lucide="settings"></i>
+            </a>
 
-            <!-- Forgot Password Link -->
-            <div id="auth-links" class="flex justify-between items-center mb-6">
-                <button type="button" onclick="handlePasswordReset()" class="text-sm text-gray-600 hover:text-[--color-primary] transition duration-300 focus:outline-none">Forgot Password?</button>
+            <div class="header-controls">
+                <div class="level-badge">
+                    <i data-lucide="award"></i> Level 5
+                </div>
+                <select id="theme-select" class="btn-secondary">
+                    <option value="neon">Neon</option>
+                    <option value="pastel">Pastel</option>
+                    <option value="contrast">High Contrast</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Vitals Display -->
+        <div class="vitals-display"
+            style="margin-top: 20px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <div class="vital-item">
+                <i data-lucide="heart" style="color: var(--danger)"></i>
+                <span style="font-weight: bold;">72</span> BPM
+            </div>
+            <div class="vital-item">
+                <i data-lucide="thermometer" style="color: var(--warn)"></i>
+                <span style="font-weight: bold;">130/80</span> mmHg
+            </div>
+            <div class="vital-item">
+                <i data-lucide="droplet" style="color: var(--accent-1)"></i>
+                <span style="font-weight: bold;">105</span> mg/dL
+            </div>
+            <div class="vital-item">
+                <i data-lucide="wind" style="color: var(--ok)"></i>
+                <span style="font-weight: bold;">97</span> SpO₂
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Health Dashboard</h1>
+
+        <!-- Compliance Score -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-content" style="padding: 30px;">
+                <h2 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                    <i data-lucide="gauge-circle" style="color: var(--accent-1)"></i>
+                    Today's Compliance Score
+                </h2>
+                <div class="progress-container" style="margin-bottom: 15px;">
+                    <div class="progress-bar" style="width: 85%"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 48px; font-weight: 900;" class="text-gradient">85%</span>
+                    <div class="xp-badge">
+                        <i data-lucide="star"></i> +15 XP Today
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-content" style="padding: 30px;">
+                <h2 style="margin-bottom: 20px;">Quick Actions</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+                    <button class="btn-primary" onclick="window.location.href='todo.html'">
+                        <i data-lucide="list-checks"></i> Today's Tasks
+                    </button>
+                    <button class="btn-secondary" onclick="window.location.href='progress.html'">
+                        <i data-lucide="trending-up"></i> Progress
+                    </button>
+                    <button class="btn-secondary" onclick="window.location.href='gamification.html'">
+                        <i data-lucide="gamepad-2"></i> Health Game
+                    </button>
+                    <button class="btn-primary" onclick="window.location.href='feedback.html'">
+                        <i data-lucide="message-square"></i> Give Feedback
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card" style="margin-bottom: 30px;">
+            <div class="card-content" style="padding: 30px;">
+                <h2 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <span>Recent Activity</span>
+                    <div class="streak-badge">
+                        <i data-lucide="flame"></i> 3 Day Streak
+                    </div>
+                </h2>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="activity-item"
+                        style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(139, 92, 246, 0.1); border-radius: 16px;">
+                        <div
+                            style="width: 40px; height: 40px; background: var(--ok); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="check-circle" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <p style="font-weight: bold;">Morning Medication Taken</p>
+                            <p style="color: var(--muted-2); font-size: 14px;">08:00 AM • +10 XP</p>
+                        </div>
+                    </div>
+                    <div class="activity-item"
+                        style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(6, 182, 212, 0.1); border-radius: 16px;">
+                        <div
+                            style="width: 40px; height: 40px; background: var(--accent-2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="activity" style="color: white;"></i>
+                        </div>
+                        <div>
+                            <p style="font-weight: bold;">BP Check Completed</p>
+                            <p style="color: var(--muted-2); font-size: 14px;">08:30 AM • +5 XP</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div class="card">
+                <div class="card-content" style="padding: 25px;">
+                    <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <i data-lucide="pill" style="color: var(--accent-1)"></i>
+                        Medication Tracker
+                    </h3>
+                    <p style="font-size: 36px; font-weight: 900; margin-bottom: 10px;" class="text-gradient">2/3</p>
+                    <p style="color: var(--muted-2); margin-bottom: 15px;">Doses Taken Today</p>
+                    <button class="btn-secondary" style="width: 100%;">Next: 08:00 PM</button>
+                </div>
             </div>
 
-            <!-- Submit Button -->
-            <button type="submit" id="auth-button" class="glowing-button w-full text-white p-3 rounded-xl font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition duration-300">
-                Access COMPASS
-            </button>
-        </form>
-        
-        <!-- Mode Toggle Link -->
-        <div class="text-center mt-6">
-             <button type="button" id="toggle-mode-link" onclick="toggleAuthMode()" class="text-sm text-[--color-primary] hover:text-[--color-accent] font-medium transition duration-300">
-                Need an account? Sign Up
-            </button>
+            <div class="card">
+                <div class="card-content" style="padding: 25px;">
+                    <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <i data-lucide="footprints" style="color: var(--accent-3)"></i>
+                        Daily Activity
+                    </h3>
+                    <p style="font-size: 36px; font-weight: 900; margin-bottom: 10px;" class="text-gradient">4,356</p>
+                    <p style="color: var(--muted-2); margin-bottom: 15px;">Steps Taken</p>
+                    <button class="btn-secondary" style="width: 100%;">Goal: 5,000 steps</button>
+                </div>
+            </div>
+        </div></br></br></br>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item active">
+            <i data-lucide="home"></i>
+            <span>Home</span>
+        </a>
+        <a href="todo.html" class="nav-item">
+            <i data-lucide="list-checks"></i>
+            <span>To-Do</span>
+        </a>
+
+        <div class="sos-button" onmousedown="startSOSCountdown()"
+            onmouseup='this.innerHTML = "<i data-lucide=\"siren\"></i>"' ontouchstart="startSOSCountdown()"
+            ontouchend='this.innerHTML = "<i data-lucide=\"siren\"></i>"' <i data-lucide="siren"></i>
         </div>
-    </div>
 
-    <!-- Firebase SDKs and Logic -->
-    <script type="module">
-        import { initializeApp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword,
-            sendPasswordResetEmail
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
-        //  AUTH STATE FLAG 
-        let appMode = 'login'; // 'login' or 'signup'
-
-        // GLOBAL FIREBASE CONFIGURATION (Direct Keys) 
-        const firebaseConfig = {
-            apiKey: "AIzaSyChN0ZW9-Ut013DO2skZjg3eudSx_RSboE", 
-            authDomain: "compass-pd.firebaseapp.com",
-            projectId: "compass-pd", 
-            storageBucket: "compass-pd.firebasestorage.app", 
-            messagingSenderId: "492535344571", 
-            appId: "1:492535344571:web:51967333a12b984a91689e",
-            measurementId: "G-YG21J97H1Z"
-        };
-        
-        let app, auth;
-
-        try {
-            setLogLevel('Debug');
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            console.log("Firebase initialized. Current mode: Login.");
-        } catch (e) {
-            console.error("Firebase Initialization Error:", e);
-        }
-
-        // UI UTILITIES 
-
-        function showAuthError(message, isCritical = true) {
-            const statusElement = document.getElementById('status-message');
-            const loginCard = document.getElementById('login-card');
-            
-            // Apply RPM theme error styling
-            statusElement.classList.remove('text-indigo-600', 'border-indigo-300', 'bg-indigo-50');
-            statusElement.classList.add('text-red-600', 'border-red-300', 'bg-red-50');
-
-            statusElement.textContent = message;
-            statusElement.classList.remove('hidden');
-            
-            if (isCritical) {
-                 //shake and visual error state
-                loginCard.style.border = '1px solid #F87171';
-                loginCard.style.boxShadow = '0 0 25px rgba(239, 68, 68, 0.5)';
-                loginCard.style.animation = 'shake-error 0.5s ease-in-out';
-                
-                setTimeout(() => {
-                    loginCard.style.border = '1px solid rgba(139, 92, 246, 0.15)';
-                    loginCard.style.boxShadow = '0 8px 32px rgba(139, 92, 246, 0.08), 0 2px 8px rgba(139, 92, 246, 0.03)';
-                    loginCard.style.animation = 'none';
-                }, 1000);
-            }
-        }
-        
-        function updateFormPrompt(message) {
-            const statusElement = document.getElementById('status-message');
-            
-            //  theme styling
-            statusElement.classList.remove('text-red-600', 'border-red-300', 'bg-red-50');
-            statusElement.classList.add('text-[--color-primary]', 'border-[--color-primary]', 'bg-[--color-bg-end]');
-            
-            statusElement.innerHTML = message;
-            statusElement.classList.remove('hidden');
-        }
-
-        function clearStatusMessage() {
-            document.getElementById('status-message').classList.add('hidden');
-        }
-
-        function redirectToDashboard() {
-            const loginCard = document.getElementById('login-card');
-            const welcomeScreen = document.getElementById('welcome-screen');
-            document.getElementById('auth-form').classList.add('hidden');
-            loginCard.classList.add('hidden');
-            welcomeScreen.style.display = 'flex';
-            
-            setTimeout(() => {
-                window.location.replace('./home.html');
-            }, 3000);
-        }
-
-        // Password visibility toggle
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggle-icon');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
-            }
-        }
-        
-        // Toggles between login and signup modes
-        window.toggleAuthMode = function(newMode) {
-            clearStatusMessage();
-            const confirmContainer = document.getElementById('confirm-password-container');
-            const authButton = document.getElementById('auth-button');
-            const toggleLink = document.getElementById('toggle-mode-link');
-            const pageTitle = document.getElementById('page-title');
-
-            if (newMode) {
-                appMode = newMode;
-            } else {
-                appMode = appMode === 'login' ? 'signup' : 'login';
-            }
-
-            if (appMode === 'signup') {
-                // confirm password field
-                confirmContainer.classList.remove('h-0', 'opacity-0', 'mb-0');
-                confirmContainer.classList.add('mb-4');
-                authButton.textContent = "Create Account & Access";
-                toggleLink.textContent = "Already have an account? Log In";
-                pageTitle.textContent = "COMPASS - New Account";
-            } else {
-                // Hide confirm password field
-                confirmContainer.classList.add('h-0', 'opacity-0', 'mb-0');
-                confirmContainer.classList.remove('mb-4');
-                authButton.textContent = "Access COMPASS";
-                toggleLink.textContent = "Need an account? Sign Up";
-                pageTitle.textContent = "COMPASS - Secure Authentication";
-            }
-        }
-
-
-        //  MAIN HANDLERS 
-        
-        // Unified Authentication Handler
-        window.handleAuth = async function() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            clearStatusMessage();
-
-            if (!email || !password) {
-                showAuthError("Please enter both email and password.");
-                return;
-            }
-
-            if (appMode === 'signup') {
-                //  SIGN UP VALIDATION 
-                if (password !== confirmPassword) {
-                    showAuthError("Passwords do not match.");
-                    return;
-                }
-                
-                // SIGN UP LOGIC
-                try {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    console.log("Account successfully created!");
-                    redirectToDashboard();
-                } catch (error) {
-                    console.error("Signup Error:", error.code, error.message);
-                    let errorMessage = "Registration failed. Please try a stronger password (min 6 chars) or different email.";
-                    
-                    if (error.code === 'auth/email-already-in-use') {
-                        errorMessage = "This account already exists. Switching to Log In mode...";
-                        toggleAuthMode('login'); 
-                    } else if (error.code === 'auth/weak-password') {
-                         errorMessage = "The password must be at least 6 characters long.";
-                    }
-                    showAuthError(errorMessage);
-                }
-
-            } else {
-                //  LOGIN LOGIC 
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    redirectToDashboard();
-
-                } catch (error) {
-                    console.error("Login Error:", error.code, error.message);
-                    
-                    let errorMessage = "Login failed. Please check your credentials.";
-                    
-                    if (error.code === 'auth/user-not-found') {
-                        // Crucial step: User not found, switch to signup mode 
-                        updateFormPrompt(`The account **${email}** was not found. Please click the button below to **Create Account**.`);
-                        toggleAuthMode('signup'); 
-                        return;
-                    } else if (error.code === 'auth/wrong-password') {
-                        errorMessage = "Invalid password.";
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMessage = "The email address format is invalid.";
-                    }
-
-                    showAuthError(errorMessage);
-                }
-            }
-        };
-
-        //password reset via email
-        window.handlePasswordReset = async function() {
-            const email = document.getElementById('email').value.trim();
-            clearStatusMessage();
-
-            if (!email) {
-                showAuthError("Please enter your email address above to receive the reset link.", false);
-                return;
-            }
-
-            try {
-                await sendPasswordResetEmail(auth, email);
-                updateFormPrompt(`A password reset link has been sent to **${email}**. Please check your inbox.`);
-            } catch (error) {
-                console.error("Password Reset Error:", error.code, error.message);
-                let errorMessage = "Could not send password reset link. Please ensure the email is correct and try again.";
-                if (error.code === 'auth/user-not-found') {
-                    errorMessage = "No account found for this email address.";
-                }
-                showAuthError(errorMessage, false);
-            }
-        };
-
-
-        // BACKGROUND GENERATION 
-        document.addEventListener('DOMContentLoaded', () => {
-            const symbolsContainer = document.getElementById('symbols-container');
-            const symbols = [
-                `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M12 20.001v-8M12 20.001v-8"></path></svg>`, // Stethoscope
-                `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 15a1 1 0 01-1-1v-3H8a1 1 0 010-2h3V8a1 1 0 012 0v3h3a1 1 0 010 2h-3v3a1 1 0 01-1 1z"/></svg>`, // Cross
-                `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.18C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`, // Heart
-                `<svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zM7 5h10v14H7V5zm2 2h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z"/></svg>` // Capsule
-            ];
-
-            for (let i = 0; i < 40; i++) { 
-                const symbol = document.createElement('div');
-                symbol.className = 'animated-symbol';
-                symbol.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
-                
-                const size = Math.random() * 25 + 25; 
-                symbol.style.fontSize = `${size}px`;
-                symbol.style.left = `${Math.random() * 100}vw`;
-                symbol.style.top = `${Math.random() * 100}vh`;
-                symbol.style.animationDelay = `${Math.random() * 15}s`; 
-                symbol.style.animationDuration = `${Math.random() * 10 + 15}s`; 
-                symbol.style.opacity = `${Math.random() * 0.5 + 0.3}`; 
-                symbol.style.transform = `scale(${Math.random() * 0.7 + 0.5})`;
-
-                symbolsContainer.appendChild(symbol);
-            }
-        });
-
-    </script>
+        <a href="progress.html" class="nav-item">
+            <i data-lucide="trending-up"></i>
+            <span>Progress</span>
+        </a>
+        <a href="gamification.html" class="nav-item">
+            <i data-lucide="gamepad-2"></i>
+            <span>Game</span>
+        </a>
+    </nav>
 </body>
+
 </html>
+
+
