@@ -4,10 +4,19 @@
 ---
 
 ## 📋 Project Overview
-**COMPASS** is a multilingual mobile application designed as an intelligent and gamified companion for patients managing chronic conditions such as diabetes, hypertension, and heart disease.  
+**COMPASS** is a mobile application designed as an intelligent and gamified companion for patients managing chronic conditions such as diabetes, hypertension, and heart disease.  
 It transforms routine health management into an engaging, supportive journey by combining **behavioral science** with **modern digital health technology**.
 
 ---
+## Login Details
+To Access the **COMPASS** Sign up with your account
+Abha Number :- Any numbers from 0-9
+Mail:- Your E-mail
+Password:- Your password
+OR Use This::
+Abha Number:- 123456
+Mail:- rohanchoure2006@gmail.com
+Password:- @123456
 
 ## 🎯 Problem Statement
 Patient non-adherence to medication and prescribed treatment plans remains one of the biggest challenges in chronic disease management, leading to:
