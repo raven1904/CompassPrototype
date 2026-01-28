@@ -9,14 +9,14 @@ It transforms routine health management into an engaging, supportive journey by 
 
 ---
 ## Login Details
-To Access the **COMPASS** Sign up with your account
-Abha Number :- Any numbers from 0-9
-Mail:- Your E-mail
-Password:- Your password
-OR Use This::
-Abha Number:- 123456
-Mail:- rohanchoure2006@gmail.com
-Password:- @123456
+To Access the **COMPASS** Sign up with your account  
+Abha Number :- Any numbers from 0-9  
+Mail:- Your E-mail  
+Password:- Your password  
+### OR Use This::  
+Abha Number:- 123456  
+Mail:- rohanchoure2006@gmail.com  
+Password:- @123456  
 
 ## 🎯 Problem Statement
 Patient non-adherence to medication and prescribed treatment plans remains one of the biggest challenges in chronic disease management, leading to:
